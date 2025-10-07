@@ -2,6 +2,7 @@ import { createSignal, Show, type Component } from "solid-js";
 import { state, setView, createItem, updateItem, setSelectedItem } from "../state/store";
 import { compressImage } from "../utils/image";
 import { Edit, Plus, X, Save, Image as ImageIcon, Loader2 } from "lucide-solid";
+import QuantityStepper from "./QuantityStepper";
 
 const EditorModal: Component = () => {
   const currentItem = () => state.items.find((item) => item.id === state.selectedItemId);
@@ -98,13 +99,9 @@ const EditorModal: Component = () => {
             {/* 数量 */}
             <div>
               <label class="mb-1 block text-sm font-medium text-gray-700">数量</label>
-              <input
-                type="number"
-                value={quantity()}
-                onInput={(e) => setQuantity(Number(e.currentTarget.value))}
-                class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-                min="0"
-              />
+              <div class="flex justify-center">
+                <QuantityStepper value={quantity()} onChange={setQuantity} min={0} />
+              </div>
             </div>
 
             {/* メモ */}

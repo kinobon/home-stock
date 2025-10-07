@@ -7,8 +7,9 @@ import {
   setSelectedItem,
   setView,
 } from "../state/store";
-import { useDebounceClick, useScrollDetection } from "../utils/scroll";
-import { Minus, Plus, Edit, Trash2 } from "lucide-solid";
+import { useScrollDetection } from "../utils/scroll";
+import { Edit, Trash2 } from "lucide-solid";
+import QuantityStepper from "./QuantityStepper";
 
 interface ItemCardProps {
   item: Item;
@@ -18,18 +19,13 @@ const ItemCard: Component<ItemCardProps> = (props) => {
   // スクロール検出
   const isScrolling = useScrollDetection();
 
-  // デバウンス付きクリックハンドラー
-  const handleIncrement = useDebounceClick(() => {
-    if (!isScrolling()) {
+  const handleQuantityChange = (newValue: number) => {
+    if (newValue > props.item.quantity) {
       incrementQuantity(props.item.id);
-    }
-  }, 300);
-
-  const handleDecrement = useDebounceClick(() => {
-    if (!isScrolling()) {
+    } else if (newValue < props.item.quantity) {
       decrementQuantity(props.item.id);
     }
-  }, 300);
+  };
 
   const handleEdit = () => {
     if (!isScrolling()) {
@@ -58,23 +54,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
         {props.item.memo && <p class="mb-3 text-sm text-gray-600">{props.item.memo}</p>}
 
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <button
-              onClick={handleDecrement}
-              disabled={isDisabled()}
-              class="flex items-center justify-center rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Minus size={18} />
-            </button>
-            <span class="min-w-[3rem] text-center text-xl font-bold">{props.item.quantity}</span>
-            <button
-              onClick={handleIncrement}
-              disabled={isDisabled()}
-              class="flex items-center justify-center rounded bg-green-500 px-3 py-1 text-white hover:bg-green-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Plus size={18} />
-            </button>
-          </div>
+          <QuantityStepper value={props.item.quantity} onChange={handleQuantityChange} min={0} />
 
           <div class="flex gap-2">
             <button
