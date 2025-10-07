@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light;
+  color: rgba(17, 24, 39, 0.87);
+  background-color: #f9fafb;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+html,
+body,
+#root {
+  overscroll-behavior: none;
+}
+
+/* iOS向けスムーズスクロール */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* iOS: ロングプレス時のテキスト選択・コンテキストメニュー無効化 */
+* {
+  -webkit-touch-callout: none; /* iOS: コンテキストメニュー無効化 */
+  -webkit-user-select: none; /* iOS: テキスト選択無効化 */
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* 入力フィールドやテキストエリアでは選択を有効に */
+input,
+textarea,
+[contenteditable="true"] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* iOS: タップハイライトを無効化 */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* iOS Safari: スクロールバーを非表示 */
+::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* デスクトップブラウザ用（オプション）: ホバー時のみ表示 */
+@media (hover: hover) and (pointer: fine) {
+  ::-webkit-scrollbar {
+    display: block;
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.4);
+  }
+}
