@@ -49,6 +49,20 @@ button:active:not(:disabled) {
   transition: transform 0.1s ease-in-out;
 }
 
+/* Lucide アイコンのスピナーアニメーション */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
 html,
 body {
   height: 100%;

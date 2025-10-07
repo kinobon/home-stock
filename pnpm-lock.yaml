@@ -13,6 +13,9 @@ importers:
       idb:
         specifier: ^8.0.3
         version: 8.0.3
+      lucide-solid:
+        specifier: ^0.545.0
+        version: 0.545.0(solid-js@1.9.9)
       nanoid:
         specifier: ^5.1.6
         version: 5.1.6
@@ -3272,6 +3275,14 @@ packages:
       {
         integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==,
       }
+
+  lucide-solid@0.545.0:
+    resolution:
+      {
+        integrity: sha512-VAzoU/4aLECC/9yGg0RfYPPtgbwpu+DVo5EysU64pGuDT6n59NRIAZanu8O9D4xlcyW3PcigvZv7kBHPN7JItQ==,
+      }
+    peerDependencies:
+      solid-js: ^1.4.7
 
   magic-string@0.25.9:
     resolution:
@@ -6572,6 +6583,10 @@ snapshots:
   lru-cache@5.1.1:
     dependencies:
       yallist: 3.1.1
+
+  lucide-solid@0.545.0(solid-js@1.9.9):
+    dependencies:
+      solid-js: 1.9.9
 
   magic-string@0.25.9:
     dependencies:

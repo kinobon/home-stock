@@ -8,6 +8,7 @@ import {
   setView,
 } from "../state/store";
 import { useDebounceClick, useScrollDetection } from "../utils/scroll";
+import { Minus, Plus, Edit, Trash2 } from "lucide-solid";
 
 interface ItemCardProps {
   item: Item;
@@ -61,17 +62,17 @@ const ItemCard: Component<ItemCardProps> = (props) => {
             <button
               onClick={handleDecrement}
               disabled={isDisabled()}
-              class="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+              class="flex items-center justify-center rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              ➖
+              <Minus size={18} />
             </button>
             <span class="min-w-[3rem] text-center text-xl font-bold">{props.item.quantity}</span>
             <button
               onClick={handleIncrement}
               disabled={isDisabled()}
-              class="rounded bg-green-500 px-3 py-1 text-white hover:bg-green-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+              class="flex items-center justify-center rounded bg-green-500 px-3 py-1 text-white hover:bg-green-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              ➕
+              <Plus size={18} />
             </button>
           </div>
 
@@ -79,16 +80,18 @@ const ItemCard: Component<ItemCardProps> = (props) => {
             <button
               onClick={handleEdit}
               disabled={isDisabled()}
-              class="rounded bg-blue-500 px-3 py-1 text-sm text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+              class="flex items-center gap-1 rounded bg-blue-500 px-3 py-1 text-sm text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              ✏️ 編集
+              <Edit size={14} />
+              編集
             </button>
             <button
               onClick={handleDelete}
               disabled={isDisabled()}
-              class="rounded bg-gray-500 px-3 py-1 text-sm text-white hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+              class="flex items-center gap-1 rounded bg-gray-500 px-3 py-1 text-sm text-white hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              🗑️ 削除
+              <Trash2 size={14} />
+              削除
             </button>
           </div>
         </div>

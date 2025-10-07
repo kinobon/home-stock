@@ -1,6 +1,7 @@
 import { createSignal, Show, type Component } from "solid-js";
 import { state, setView, createItem, updateItem, setSelectedItem } from "../state/store";
 import { compressImage } from "../utils/image";
+import { Edit, Plus, X, Save, Image as ImageIcon, Loader2 } from "lucide-solid";
 
 const EditorModal: Component = () => {
   const currentItem = () => state.items.find((item) => item.id === state.selectedItemId);
@@ -65,7 +66,19 @@ const EditorModal: Component = () => {
     <Show when={state.view === "editor"}>
       <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
         <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-          <h2 class="mb-4 text-xl font-bold">{currentItem() ? "✏️ 編集" : "➕ 新規追加"}</h2>
+          <h2 class="mb-4 flex items-center gap-2 text-xl font-bold">
+            {currentItem() ? (
+              <>
+                <Edit size={24} />
+                編集
+              </>
+            ) : (
+              <>
+                <Plus size={24} />
+                新規追加
+              </>
+            )}
+          </h2>
 
           <div class="space-y-4">
             {/* 名前 */}
@@ -108,7 +121,10 @@ const EditorModal: Component = () => {
 
             {/* 写真 */}
             <div>
-              <label class="mb-1 block text-sm font-medium text-gray-700">写真</label>
+              <label class="mb-1 flex items-center gap-1 text-sm font-medium text-gray-700">
+                <ImageIcon size={16} />
+                写真
+              </label>
               <input
                 type="file"
                 accept="image/*"
@@ -120,7 +136,10 @@ const EditorModal: Component = () => {
                 <img src={photo()} alt="Preview" class="mt-2 h-32 w-full rounded object-cover" />
               </Show>
               <Show when={isProcessing()}>
-                <p class="mt-2 text-sm text-gray-500">画像を処理中...</p>
+                <p class="mt-2 flex items-center gap-1 text-sm text-gray-500">
+                  <Loader2 size={16} class="animate-spin" />
+                  画像を処理中...
+                </p>
               </Show>
             </div>
           </div>
@@ -129,15 +148,17 @@ const EditorModal: Component = () => {
           <div class="mt-6 flex gap-3">
             <button
               onClick={handleClose}
-              class="flex-1 rounded bg-gray-200 py-2 text-gray-700 hover:bg-gray-300"
+              class="flex flex-1 items-center justify-center gap-1 rounded bg-gray-200 py-2 text-gray-700 hover:bg-gray-300"
             >
+              <X size={18} />
               キャンセル
             </button>
             <button
               onClick={handleSave}
-              class="flex-1 rounded bg-blue-500 py-2 text-white hover:bg-blue-600"
+              class="flex flex-1 items-center justify-center gap-1 rounded bg-blue-500 py-2 text-white hover:bg-blue-600"
               disabled={isProcessing()}
             >
+              <Save size={18} />
               保存
             </button>
           </div>
