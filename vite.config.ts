@@ -1,4 +1,4 @@
-import { defineConfig, type PluginOption } from "vite";
+import { defineConfig } from "vite";
 import solid from "vite-plugin-solid";
 import { VitePWA } from "vite-plugin-pwa";
 
@@ -48,7 +48,7 @@ export default defineConfig({
           },
         ],
       },
-    }) as PluginOption,
+    }),
   ],
   base: "/home-stock/",
   server: {

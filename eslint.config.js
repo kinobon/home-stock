@@ -15,6 +15,17 @@ export default tseslint.config(
   },
   prettier,
   {
-    ignores: ["dist/**", "node_modules/**", "*.config.{js,ts}"],
+    ignores: [
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      ".vite/**",
+      ".solid/**",
+      "**/*.cache/**",
+      "dev-dist/**",
+      "sw.js",
+      "workbox-*.js",
+      "*.config.{js,ts}",
+    ],
   }
 );
