@@ -42,7 +42,7 @@ const ItemList: Component = () => {
           </p>
         </div>
       ) : (
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="flex flex-col gap-3">
           <For each={filteredAndSortedItems()}>{(item) => <ItemCard item={item} />}</For>
         </div>
       )}
