@@ -16,7 +16,7 @@ interface ItemCardProps {
 }
 
 const ItemCard: Component<ItemCardProps> = (props) => {
-  // スクロール検出
+  // スクロール検出（編集・削除ボタン用）
   const isScrolling = useScrollDetection();
 
   const handleQuantityChange = (newValue: number) => {

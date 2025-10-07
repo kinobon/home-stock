@@ -1,6 +1,5 @@
 import { createMemo, type Component } from "solid-js";
 import { Minus, Plus } from "lucide-solid";
-import { useDebounceClick, useScrollDetection } from "../utils/scroll";
 
 interface QuantityStepperProps {
   value: number;
@@ -12,36 +11,27 @@ interface QuantityStepperProps {
 
 /**
  * QuantityStepper - 在庫数量を増減するUIコンポーネント
- *
- * iOS最適化:
- * - スクロール中は自動的に無効化
- * - デバウンス処理で連打を防止
- * - パフォーマンスを考慮した実装
  */
 export const QuantityStepper: Component<QuantityStepperProps> = (props) => {
-  // スクロール検出
-  const isScrolling = useScrollDetection();
-
-  // デバウンス付きクリックハンドラー
-  const handleDecrement = useDebounceClick(() => {
-    if (!isScrolling() && !props.disabled) {
+  // クリックハンドラー
+  const handleDecrement = () => {
+    if (!props.disabled) {
       const newValue = Math.max(props.min ?? 0, props.value - 1);
       props.onChange(newValue);
     }
-  }, 300);
+  };
 
-  const handleIncrement = useDebounceClick(() => {
-    if (!isScrolling() && !props.disabled) {
+  const handleIncrement = () => {
+    if (!props.disabled) {
       const newValue = Math.min(props.max ?? Infinity, props.value + 1);
       props.onChange(newValue);
     }
-  }, 300);
+  };
 
   // ボタンの無効化状態
-  const isDisabled = createMemo(() => isScrolling() || props.disabled);
-  const isDecrementDisabled = createMemo(() => isDisabled() || props.value <= (props.min ?? 0));
+  const isDecrementDisabled = createMemo(() => props.disabled || props.value <= (props.min ?? 0));
   const isIncrementDisabled = createMemo(
-    () => isDisabled() || (props.max !== undefined && props.value >= props.max)
+    () => props.disabled || (props.max !== undefined && props.value >= props.max)
   );
 
   return (
