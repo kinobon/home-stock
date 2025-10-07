@@ -3,12 +3,15 @@ import { initializeStore } from "./state/store";
 import Header from "./components/Header";
 import ItemList from "./components/ItemList";
 import EditorModal from "./components/EditorModal";
-import { useIOSScrollDebounce } from "./utils/scroll";
+import { useIOSScrollDebounce, optimizeTouchEvents } from "./utils/scroll";
 
 const App: Component = () => {
   onMount(async () => {
     // IndexedDB からデータをロード
     await initializeStore();
+
+    // iOS タッチイベント最適化
+    optimizeTouchEvents();
 
     // iOS スクロールデバウンス対策
     useIOSScrollDebounce(() => {
