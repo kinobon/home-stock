@@ -45,25 +45,28 @@ export const QuantityStepper: Component<QuantityStepperProps> = (props) => {
   );
 
   return (
-    <div class="flex items-center gap-2">
+    <div class="inline-flex items-center gap-1 rounded-full bg-gray-100 p-1">
       <button
         onClick={handleDecrement}
         disabled={isDecrementDisabled()}
-        class="flex items-center justify-center rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+        class="flex h-8 w-8 items-center justify-center rounded-full bg-white text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:shadow active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none"
         aria-label="数量を減らす"
       >
-        <Minus size={18} />
+        <Minus size={18} strokeWidth={2.5} />
       </button>
-      <span class="min-w-[3rem] text-center text-xl font-bold" aria-live="polite">
+      <span
+        class="min-w-[3rem] px-2 text-center text-lg font-semibold text-gray-900"
+        aria-live="polite"
+      >
         {props.value}
       </span>
       <button
         onClick={handleIncrement}
         disabled={isIncrementDisabled()}
-        class="flex items-center justify-center rounded bg-green-500 px-3 py-1 text-white hover:bg-green-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+        class="flex h-8 w-8 items-center justify-center rounded-full bg-white text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:shadow active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none"
         aria-label="数量を増やす"
       >
-        <Plus size={18} />
+        <Plus size={18} strokeWidth={2.5} />
       </button>
     </div>
   );

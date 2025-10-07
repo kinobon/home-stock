@@ -65,8 +65,8 @@ const EditorModal: Component = () => {
 
   return (
     <Show when={state.view === "editor"}>
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-        <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+        <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
           <h2 class="mb-4 flex items-center gap-2 text-xl font-bold">
             {currentItem() ? (
               <>
@@ -91,7 +91,7 @@ const EditorModal: Component = () => {
                 type="text"
                 value={name()}
                 onInput={(e) => setName(e.currentTarget.value)}
-                class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+                class="w-full rounded-lg border-2 border-gray-300 bg-gray-50 px-4 py-3 transition-all focus:border-blue-500 focus:bg-white focus:shadow-md focus:outline-none"
                 placeholder="例: 入浴剤(ゆず)"
               />
             </div>
@@ -110,7 +110,7 @@ const EditorModal: Component = () => {
               <textarea
                 value={memo()}
                 onInput={(e) => setMemo(e.currentTarget.value)}
-                class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+                class="w-full rounded-lg border-2 border-gray-300 bg-gray-50 px-4 py-3 transition-all focus:border-blue-500 focus:bg-white focus:shadow-md focus:outline-none"
                 rows="3"
                 placeholder="補足情報など"
               />
@@ -145,14 +145,14 @@ const EditorModal: Component = () => {
           <div class="mt-6 flex gap-3">
             <button
               onClick={handleClose}
-              class="flex flex-1 items-center justify-center gap-1 rounded bg-gray-200 py-2 text-gray-700 hover:bg-gray-300"
+              class="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-gray-300 py-3 font-medium text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50"
             >
               <X size={18} />
               キャンセル
             </button>
             <button
               onClick={handleSave}
-              class="flex flex-1 items-center justify-center gap-1 rounded bg-blue-500 py-2 text-white hover:bg-blue-600"
+              class="flex flex-1 items-center justify-center gap-2 rounded-full bg-blue-600 py-3 font-medium text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg disabled:cursor-not-allowed disabled:bg-gray-300 disabled:shadow-none"
               disabled={isProcessing()}
             >
               <Save size={18} />

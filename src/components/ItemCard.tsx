@@ -45,33 +45,37 @@ const ItemCard: Component<ItemCardProps> = (props) => {
   const isDisabled = createMemo(() => isScrolling());
 
   return (
-    <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+    <div class="overflow-hidden rounded-lg bg-white shadow-md transition-all duration-200 hover:shadow-xl">
       {props.item.photo && (
-        <img src={props.item.photo} alt={props.item.name} class="h-48 w-full object-cover" />
+        <div class="relative aspect-video w-full overflow-hidden bg-gray-100">
+          <img src={props.item.photo} alt={props.item.name} class="h-full w-full object-cover" />
+        </div>
       )}
       <div class="p-4">
-        <h3 class="mb-2 text-lg font-semibold text-gray-800">{props.item.name}</h3>
-        {props.item.memo && <p class="mb-3 text-sm text-gray-600">{props.item.memo}</p>}
+        <h3 class="mb-1 text-xl font-medium text-gray-900">{props.item.name}</h3>
+        {props.item.memo && (
+          <p class="mb-4 text-sm leading-relaxed text-gray-600">{props.item.memo}</p>
+        )}
 
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between gap-3">
           <QuantityStepper value={props.item.quantity} onChange={handleQuantityChange} min={0} />
 
           <div class="flex gap-2">
             <button
               onClick={handleEdit}
               disabled={isDisabled()}
-              class="flex items-center gap-1 rounded bg-blue-500 px-3 py-1 text-sm text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+              class="flex items-center gap-1.5 rounded-full bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              <Edit size={14} />
+              <Edit size={16} />
               編集
             </button>
             <button
               onClick={handleDelete}
               disabled={isDisabled()}
-              class="flex items-center gap-1 rounded bg-gray-500 px-3 py-1 text-sm text-white hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+              class="flex items-center justify-center rounded-full bg-red-50 p-2 text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
+              aria-label="削除"
             >
-              <Trash2 size={14} />
-              削除
+              <Trash2 size={18} />
             </button>
           </div>
         </div>
