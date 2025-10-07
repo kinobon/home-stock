@@ -5,7 +5,7 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
   plugins: [
     solid(),
-    // @ts-expect-error - Vite Plugin PWA の型定義の競合を回避
+    // @ts-ignore - Vite Plugin PWA の型定義の競合を回避
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
