@@ -1,7 +1,14 @@
 import { createSignal, Show, type Component } from "solid-js";
-import { state, setView, createItem, updateItem, setSelectedItem } from "../state/store";
+import {
+  state,
+  setView,
+  createItem,
+  updateItem,
+  setSelectedItem,
+  removeItem,
+} from "../state/store";
 import { compressImage } from "../utils/image";
-import { Edit, Plus, X, Save, Image as ImageIcon, Loader2 } from "lucide-solid";
+import { Edit, Plus, X, Save, Image as ImageIcon, Loader2, Trash2 } from "lucide-solid";
 import QuantityStepper from "./QuantityStepper";
 
 const EditorModal: Component = () => {
@@ -61,6 +68,14 @@ const EditorModal: Component = () => {
     setQuantity(0);
     setMemo("");
     setPhoto("");
+  };
+
+  const handleDelete = () => {
+    if (!currentItem()) return;
+    if (confirm(`「${currentItem()!.name}」を削除しますか?`)) {
+      removeItem(currentItem()!.id);
+      handleClose();
+    }
   };
 
   return (
@@ -142,22 +157,35 @@ const EditorModal: Component = () => {
           </div>
 
           {/* ボタン */}
-          <div class="mt-6 flex gap-3">
-            <button
-              onClick={handleClose}
-              class="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-gray-300 py-3 font-medium text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50"
-            >
-              <X size={18} />
-              キャンセル
-            </button>
-            <button
-              onClick={handleSave}
-              class="flex flex-1 items-center justify-center gap-2 rounded-full bg-blue-600 py-3 font-medium text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg disabled:cursor-not-allowed disabled:bg-gray-300 disabled:shadow-none"
-              disabled={isProcessing()}
-            >
-              <Save size={18} />
-              保存
-            </button>
+          <div class="mt-6 flex flex-col gap-3">
+            <div class="flex gap-3">
+              <button
+                onClick={handleClose}
+                class="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-gray-300 py-3 font-medium text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50"
+              >
+                <X size={18} />
+                キャンセル
+              </button>
+              <button
+                onClick={handleSave}
+                class="flex flex-1 items-center justify-center gap-2 rounded-full bg-blue-600 py-3 font-medium text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg disabled:cursor-not-allowed disabled:bg-gray-300 disabled:shadow-none"
+                disabled={isProcessing()}
+              >
+                <Save size={18} />
+                保存
+              </button>
+            </div>
+
+            {/* 削除ボタン（編集時のみ表示） */}
+            <Show when={currentItem()}>
+              <button
+                onClick={handleDelete}
+                class="flex w-full items-center justify-center gap-2 rounded-full border-2 border-red-200 py-3 font-medium text-red-600 transition-all hover:border-red-300 hover:bg-red-50"
+              >
+                <Trash2 size={18} />
+                削除
+              </button>
+            </Show>
           </div>
         </div>
       </div>
