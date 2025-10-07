@@ -1,11 +1,10 @@
-import { defineConfig } from "vite";
+import { defineConfig, type PluginOption } from "vite";
 import solid from "vite-plugin-solid";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   plugins: [
     solid(),
-    // @ts-ignore - Vite Plugin PWA の型定義の競合を回避
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
@@ -49,7 +48,7 @@ export default defineConfig({
           },
         ],
       },
-    }),
+    }) as PluginOption,
   ],
   base: "/home-stock/",
   server: {
