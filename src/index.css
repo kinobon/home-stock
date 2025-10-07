@@ -19,6 +19,8 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 * {
@@ -50,27 +52,20 @@ button:active:not(:disabled) {
 html,
 body {
   height: 100%;
-  overflow: hidden;
 }
 
 html,
 body,
 #root {
-  overscroll-behavior: none;
-}
-
-/* iOS向けスムーズスクロール */
-* {
-  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  overscroll-behavior-x: none;
 }
 
 /* iOS: ロングプレス時のテキスト選択・コンテキストメニュー無効化 */
-* {
+button,
+a,
+[role="button"] {
   -webkit-touch-callout: none; /* iOS: コンテキストメニュー無効化 */
-  -webkit-user-select: none; /* iOS: テキスト選択無効化 */
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
 }
 
 /* 入力フィールドやテキストエリアでは選択を有効に */
@@ -81,12 +76,10 @@ textarea,
   -moz-user-select: text;
   -ms-user-select: text;
   user-select: text;
+  -webkit-touch-callout: default;
 }
 
-/* iOS: タップハイライトを無効化 */
-* {
-  -webkit-tap-highlight-color: transparent;
-}
+/* iOS: タップハイライトは既に上部で設定済み */
 
 /* iOS Safari: スクロールバーを非表示 */
 ::-webkit-scrollbar {
