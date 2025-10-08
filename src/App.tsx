@@ -1,4 +1,5 @@
 import { onMount, Show, type Component } from "solid-js";
+import { createSignal, createEffect } from "solid-js";
 import { state, initializeStore } from "./state/store";
 import Header from "./components/Header";
 import ItemList from "./components/ItemList";
@@ -7,8 +8,34 @@ import BottomNav from "./components/BottomNav";
 import Settings from "./components/Settings";
 import FAB from "./components/FAB";
 import { useIOSScrollDebounce, optimizeTouchEvents } from "./utils/scroll";
+import { tabTransition } from "./utils/transition";
 
 const App: Component = () => {
+  const [prevTabIndex, setPrevTabIndex] = createSignal(0);
+  const [currentTabIndex, setCurrentTabIndex] = createSignal(0);
+
+  // タブ名からインデックスへのマッピング
+  const getTabIndex = (tab: string) => {
+    return tab === "items" ? 0 : 1;
+  };
+
+  // タブ変更を検知してインデックスを更新
+  createEffect(() => {
+    const newIndex = getTabIndex(state.currentTab);
+    setPrevTabIndex(currentTabIndex());
+    setCurrentTabIndex(newIndex);
+  });
+
+  // トランジション適用用のref
+  const applyTransition = (el: HTMLDivElement) => {
+    createEffect(() => {
+      // タブが変更されたらトランジションを適用
+      // state.currentTabを読み取ることで依存関係を確立
+      void state.currentTab;
+      tabTransition(el, prevTabIndex(), currentTabIndex(), 300);
+    });
+  };
+
   onMount(async () => {
     // IndexedDB からデータをロード
     await initializeStore();
@@ -31,7 +58,7 @@ const App: Component = () => {
       </Show>
 
       {/* タブコンテンツ（スクロール可能エリア） */}
-      <div class="flex-1 overflow-y-auto overscroll-contain">
+      <div ref={applyTransition} class="flex-1 overflow-y-auto overscroll-contain">
         <Show when={state.currentTab === "items"}>
           <ItemList />
         </Show>
