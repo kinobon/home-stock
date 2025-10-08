@@ -6,11 +6,12 @@ import { getAllItems, saveItem, deleteItem, clearAllItems } from "./db";
 const initialState: AppState = {
   items: [],
   searchQuery: "",
-  sortBy: "name",
+  sortBy: "custom",
   isAscending: true,
   selectedItemId: undefined,
   view: "list",
   currentTab: "items",
+  isEditMode: false,
 };
 
 export const [state, setState] = createStore<AppState>(initialState);
@@ -106,8 +107,28 @@ export function setSearchQuery(query: string) {
   setState("searchQuery", query);
 }
 
-export function setSortBy(sortBy: "name" | "quantity") {
+export function setSortBy(sortBy: "name" | "quantity" | "custom") {
   setState("sortBy", sortBy);
+}
+
+export function setEditMode(isEditMode: boolean) {
+  setState("isEditMode", isEditMode);
+}
+
+export function reorderItems(newOrder: string[]) {
+  // 新しい順序でアイテムを並び替え
+  const itemsMap = new Map(state.items.map((item) => [item.id, item]));
+  const reorderedItems = newOrder
+    .map((id) => itemsMap.get(id))
+    .filter((item): item is Item => item !== undefined)
+    .map((item, index) => ({ ...item, order: index, updatedAt: Date.now() }));
+
+  // IndexedDBに保存
+  reorderedItems.forEach((item) => saveItem(item));
+  setState("items", reorderedItems);
+
+  // カスタムソートモードに切り替え
+  setState("sortBy", "custom");
 }
 
 export function toggleSortOrder() {

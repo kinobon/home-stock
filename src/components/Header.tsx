@@ -1,6 +1,13 @@
 import type { Component } from "solid-js";
-import { state, setSearchQuery, setSortBy, toggleSortOrder, setView } from "../state/store";
-import { Home, Search, Plus, ArrowUpDown } from "lucide-solid";
+import {
+  state,
+  setSearchQuery,
+  setSortBy,
+  toggleSortOrder,
+  setView,
+  setEditMode,
+} from "../state/store";
+import { Home, Search, Plus, ArrowUpDown, Edit3, Check } from "lucide-solid";
 
 const Header: Component = () => {
   return (
@@ -30,7 +37,7 @@ const Header: Component = () => {
             <div class="inline-flex overflow-hidden rounded-lg bg-gray-100 shadow-sm">
               <button
                 onClick={() => setSortBy("name")}
-                class={`px-4 py-2 text-sm font-medium transition-colors ${
+                class={`px-3 py-2 text-xs font-medium transition-colors sm:text-sm ${
                   state.sortBy === "name"
                     ? "bg-blue-600 text-white"
                     : "text-gray-700 hover:bg-gray-200"
@@ -40,7 +47,7 @@ const Header: Component = () => {
               </button>
               <button
                 onClick={() => setSortBy("quantity")}
-                class={`px-4 py-2 text-sm font-medium transition-colors ${
+                class={`px-3 py-2 text-xs font-medium transition-colors sm:text-sm ${
                   state.sortBy === "quantity"
                     ? "bg-blue-600 text-white"
                     : "text-gray-700 hover:bg-gray-200"
@@ -49,24 +56,66 @@ const Header: Component = () => {
                 数量順
               </button>
               <button
+                onClick={() => setSortBy("custom")}
+                class={`px-3 py-2 text-xs font-medium transition-colors sm:text-sm ${
+                  state.sortBy === "custom"
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                カスタム
+              </button>
+              <button
                 onClick={toggleSortOrder}
-                class="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
+                disabled={state.sortBy === "custom"}
+                class={`flex items-center gap-1 px-3 py-2 text-xs font-medium transition-colors sm:text-sm ${
+                  state.sortBy === "custom"
+                    ? "cursor-not-allowed text-gray-400"
+                    : "text-gray-700 hover:bg-gray-200"
+                }`}
                 title={state.isAscending ? "昇順" : "降順"}
               >
                 <ArrowUpDown size={16} />
               </button>
             </div>
 
-            {/* 新規追加ボタン */}
-            <button
-              onClick={() => {
-                setView("editor");
-              }}
-              class="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700"
-            >
-              <Plus size={16} />
-              新規追加
-            </button>
+            {/* 右側ボタングループ */}
+            <div class="flex items-center gap-2">
+              {/* 編集モード切り替えボタン（カスタムソート時のみ表示） */}
+              {state.sortBy === "custom" && (
+                <button
+                  onClick={() => setEditMode(!state.isEditMode)}
+                  class={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium shadow-sm transition-all ${
+                    state.isEditMode
+                      ? "bg-green-600 text-white hover:bg-green-700"
+                      : "bg-gray-600 text-white hover:bg-gray-700"
+                  }`}
+                >
+                  {state.isEditMode ? (
+                    <>
+                      <Check size={16} />
+                      完了
+                    </>
+                  ) : (
+                    <>
+                      <Edit3 size={16} />
+                      並び替え
+                    </>
+                  )}
+                </button>
+              )}
+
+              {/* 新規追加ボタン */}
+              <button
+                onClick={() => {
+                  setView("editor");
+                }}
+                class="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700"
+              >
+                <Plus size={16} />
+                新規追加
+              </button>
+            </div>
           </div>
         </div>
       </div>
