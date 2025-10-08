@@ -105,7 +105,7 @@ const Settings: Component = () => {
           <dl class="space-y-2 text-sm">
             <div class="flex justify-between">
               <dt class="text-gray-600">バージョン</dt>
-              <dd class="font-medium text-gray-900">1.0.0</dd>
+              <dd class="font-medium text-gray-900">{__GIT_HASH__}</dd>
             </div>
             <div class="flex justify-between">
               <dt class="text-gray-600">ライセンス</dt>

@@ -1,8 +1,21 @@
 import { defineConfig } from "vite";
 import solid from "vite-plugin-solid";
 import { VitePWA } from "vite-plugin-pwa";
+import { execSync } from "child_process";
+
+// Gitコミットハッシュを取得
+const getGitHash = () => {
+  try {
+    return execSync("git rev-parse --short HEAD").toString().trim();
+  } catch {
+    return "dev";
+  }
+};
 
 export default defineConfig({
+  define: {
+    __GIT_HASH__: JSON.stringify(getGitHash()),
+  },
   optimizeDeps: {
     exclude: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime"],
   },
