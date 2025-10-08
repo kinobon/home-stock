@@ -66,7 +66,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
       {/* ドラッグハンドル（編集モード時のみ表示・右側） */}
       {props.isDraggable && (
         <div
-          class="flex h-full cursor-grab touch-none items-center px-2 text-gray-400 active:cursor-grabbing"
+          class="flex h-full cursor-grab touch-none items-center px-3 text-gray-400 active:cursor-grabbing"
           onTouchStart={props.onHandleTouchStart}
           onTouchMove={props.onHandleTouchMove}
           onTouchEnd={props.onHandleTouchEnd}
