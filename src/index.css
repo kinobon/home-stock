@@ -44,10 +44,10 @@ a,
 }
 
 /* ボタンのアクティブ状態を視覚的にフィードバック */
-button:active:not(:disabled) {
+/* button:active:not(:disabled) {
   transform: scale(0.95);
   transition: transform 0.1s ease-in-out;
-}
+} */
 
 /* Lucide アイコンのスピナーアニメーション */
 @keyframes spin {
