@@ -160,17 +160,46 @@ export function exportData(): string {
 export async function importData(jsonString: string) {
   try {
     const data = JSON.parse(jsonString);
-    if (!data.items || !Array.isArray(data.items)) {
-      throw new Error("Invalid data format");
+
+    // バリデーション
+    if (!data || typeof data !== "object") {
+      throw new Error("無効なデータ形式です");
     }
+
+    if (!data.items) {
+      throw new Error("items フィールドが見つかりません");
+    }
+
+    if (!Array.isArray(data.items)) {
+      throw new Error("items フィールドは配列である必要があります");
+    }
+
+    // 各アイテムの基本的なバリデーション
+    for (const item of data.items) {
+      if (!item.id || typeof item.id !== "string") {
+        throw new Error("アイテムに有効な id がありません");
+      }
+      if (!item.name || typeof item.name !== "string") {
+        throw new Error("アイテムに有効な name がありません");
+      }
+      if (typeof item.quantity !== "number") {
+        throw new Error("アイテムに有効な quantity がありません");
+      }
+    }
+
+    console.log(`[importData] Validated ${data.items.length} items`);
 
     await clearAllItems();
     for (const item of data.items) {
       await saveItem(item);
     }
     setState("items", data.items);
+    console.log("[importData] Import completed successfully");
   } catch (error) {
-    console.error("Import failed:", error);
+    console.error("[importData] Import failed:", error);
+    if (error instanceof SyntaxError) {
+      throw new Error("無効なJSON形式です");
+    }
     throw error;
   }
 }
