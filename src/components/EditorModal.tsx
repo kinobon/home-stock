@@ -1,4 +1,4 @@
-import { createSignal, Show, type Component } from "solid-js";
+import { createSignal, createEffect, batch, Show, type Component } from "solid-js";
 import {
   state,
   setView,
@@ -14,11 +14,31 @@ import QuantityStepper from "./QuantityStepper";
 const EditorModal: Component = () => {
   const currentItem = () => state.items.find((item) => item.id === state.selectedItemId);
 
-  const [name, setName] = createSignal(currentItem()?.name || "");
-  const [quantity, setQuantity] = createSignal(currentItem()?.quantity || 0);
-  const [memo, setMemo] = createSignal(currentItem()?.memo || "");
-  const [photo, setPhoto] = createSignal(currentItem()?.photo || "");
+  const [name, setName] = createSignal("");
+  const [quantity, setQuantity] = createSignal(0);
+  const [memo, setMemo] = createSignal("");
+  const [photo, setPhoto] = createSignal("");
   const [isProcessing, setIsProcessing] = createSignal(false);
+
+  // モーダルが開かれたときに currentItem の値を反映
+  createEffect(() => {
+    if (state.view === "editor") {
+      const item = currentItem();
+      batch(() => {
+        if (item) {
+          setName(item.name);
+          setQuantity(item.quantity);
+          setMemo(item.memo || "");
+          setPhoto(item.photo || "");
+        } else {
+          setName("");
+          setQuantity(0);
+          setMemo("");
+          setPhoto("");
+        }
+      });
+    }
+  });
 
   const handlePhotoChange = async (e: Event) => {
     const input = e.currentTarget as HTMLInputElement;
@@ -64,10 +84,6 @@ const EditorModal: Component = () => {
   const handleClose = () => {
     setSelectedItem(undefined);
     setView("list");
-    setName("");
-    setQuantity(0);
-    setMemo("");
-    setPhoto("");
   };
 
   const handleDelete = () => {
