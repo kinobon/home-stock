@@ -19,11 +19,11 @@ const ItemCard: Component<ItemCardProps> = (props) => {
     >
       {/* サムネイル画像（正方形クリップ） */}
       {props.item.photo ? (
-        <div class="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
+        <div class="bg-gray-80 relative size-9 flex-shrink-0 overflow-hidden rounded-lg">
           <img src={props.item.photo} alt={props.item.name} class="h-full w-full object-cover" />
         </div>
       ) : (
-        <div class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100">
+        <div class="flex size-9 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100">
           <span class="text-3xl">📦</span>
         </div>
       )}
