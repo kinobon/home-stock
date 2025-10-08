@@ -1,4 +1,4 @@
-import { For, createMemo, createSignal, type Component } from "solid-js";
+import { For, createMemo, createSignal, onMount, onCleanup, type Component } from "solid-js";
 import { state, reorderItems } from "../state/store";
 import ItemCard from "./ItemCard";
 import { Package, Plus } from "lucide-solid";
@@ -6,6 +6,32 @@ import { Package, Plus } from "lucide-solid";
 const ItemList: Component = () => {
   const [draggedIndex, setDraggedIndex] = createSignal<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = createSignal<number | null>(null);
+  let containerRef: HTMLDivElement | undefined;
+  let scrollContainerRef: HTMLElement | null = null;
+  let autoScrollInterval: number | undefined;
+
+  onMount(() => {
+    // 親のスクロールコンテナを探す
+    if (containerRef) {
+      let parent = containerRef.parentElement;
+      while (parent) {
+        const overflowY = window.getComputedStyle(parent).overflowY;
+        if (overflowY === "auto" || overflowY === "scroll") {
+          scrollContainerRef = parent;
+          break;
+        }
+        parent = parent.parentElement;
+      }
+    }
+  });
+
+  onCleanup(() => {
+    // コンポーネントのクリーンアップ時に自動スクロールを停止
+    if (autoScrollInterval) {
+      clearInterval(autoScrollInterval);
+      autoScrollInterval = undefined;
+    }
+  });
 
   const filteredAndSortedItems = createMemo(() => {
     let items = [...state.items];
@@ -104,6 +130,44 @@ const ItemList: Component = () => {
     const touch = e.touches[0];
     if (!touch) return;
 
+    // 自動スクロール処理
+    if (scrollContainerRef) {
+      const rect = scrollContainerRef.getBoundingClientRect();
+      const scrollThreshold = 100; // 端から100pxの範囲で自動スクロール
+      const scrollSpeed = 8; // スクロール速度
+
+      // 上端に近い場合
+      if (touch.clientY - rect.top < scrollThreshold) {
+        if (!autoScrollInterval) {
+          autoScrollInterval = window.setInterval(() => {
+            if (scrollContainerRef && scrollContainerRef.scrollTop > 0) {
+              scrollContainerRef.scrollTop -= scrollSpeed;
+            }
+          }, 16); // 約60fps
+        }
+      }
+      // 下端に近い場合
+      else if (rect.bottom - touch.clientY < scrollThreshold) {
+        if (!autoScrollInterval) {
+          autoScrollInterval = window.setInterval(() => {
+            if (scrollContainerRef) {
+              const maxScroll = scrollContainerRef.scrollHeight - scrollContainerRef.clientHeight;
+              if (scrollContainerRef.scrollTop < maxScroll) {
+                scrollContainerRef.scrollTop += scrollSpeed;
+              }
+            }
+          }, 16);
+        }
+      }
+      // 端から離れた場合は自動スクロール停止
+      else {
+        if (autoScrollInterval) {
+          clearInterval(autoScrollInterval);
+          autoScrollInterval = undefined;
+        }
+      }
+    }
+
     // タッチ位置から該当する要素を取得
     const element = document.elementFromPoint(touch.clientX, touch.clientY);
     if (!element) return;
@@ -120,11 +184,18 @@ const ItemList: Component = () => {
 
   const handleHandleTouchEnd = () => {
     if (!state.isEditMode) return;
+
+    // 自動スクロール停止
+    if (autoScrollInterval) {
+      clearInterval(autoScrollInterval);
+      autoScrollInterval = undefined;
+    }
+
     handleDragEnd();
   };
 
   return (
-    <div class="mx-auto max-w-4xl">
+    <div ref={containerRef} class="mx-auto max-w-4xl">
       {filteredAndSortedItems().length === 0 ? (
         <div class="flex flex-col items-center justify-center py-16 text-center text-gray-500">
           <Package size={64} class="mb-4 text-gray-300" />
