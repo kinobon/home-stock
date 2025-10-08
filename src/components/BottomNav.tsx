@@ -4,7 +4,7 @@ import { Package, Settings } from "lucide-solid";
 
 const BottomNav: Component = () => {
   return (
-    <nav class="safe-area-inset-bottom fixed right-0 bottom-0 left-0 z-40 border-t border-gray-200 bg-white">
+    <nav class="safe-area-inset-bottom border-t border-gray-200 bg-white">
       <div class="flex h-16">
         <button
           onClick={() => setCurrentTab("items")}

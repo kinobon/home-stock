@@ -123,7 +123,7 @@ const ItemList: Component = () => {
   };
 
   return (
-    <div class="mx-auto max-w-4xl px-4 pt-6 pb-20">
+    <div class="mx-auto max-w-4xl px-4 py-6">
       {filteredAndSortedItems().length === 0 ? (
         <div class="flex flex-col items-center justify-center py-16 text-center text-gray-500">
           <Package size={64} class="mb-4 text-gray-300" />

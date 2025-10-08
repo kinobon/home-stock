@@ -42,7 +42,7 @@ const Settings: Component = () => {
   };
 
   return (
-    <div class="mx-auto max-w-4xl px-4 pt-6 pb-20">
+    <div class="mx-auto max-w-4xl px-4 py-6">
       <h1 class="mb-6 text-2xl font-bold text-gray-900">設定</h1>
 
       <div class="space-y-4">
