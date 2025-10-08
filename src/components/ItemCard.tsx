@@ -1,7 +1,7 @@
 import type { Component } from "solid-js";
-import { setSelectedItem, setView } from "../state/store";
+import { setSelectedItem, setView, incrementQuantity, decrementQuantity } from "../state/store";
 import type { Item } from "../types";
-import { GripVertical } from "lucide-solid";
+import { GripVertical, Minus, Plus } from "lucide-solid";
 
 interface ItemCardProps {
   item: Item;
@@ -25,6 +25,16 @@ const ItemCard: Component<ItemCardProps> = (props) => {
     setView("editor");
   };
 
+  const handleIncrement = (e: MouseEvent) => {
+    e.stopPropagation();
+    incrementQuantity(props.item.id);
+  };
+
+  const handleDecrement = (e: MouseEvent) => {
+    e.stopPropagation();
+    decrementQuantity(props.item.id);
+  };
+
   return (
     <div
       data-item-index={props.index}
@@ -33,33 +43,62 @@ const ItemCard: Component<ItemCardProps> = (props) => {
       onDragOver={props.onDragOver}
       onDragEnd={props.onDragEnd}
       onDragLeave={props.onDragLeave}
-      class={"flex w-full items-center gap-3 border-b border-gray-200 bg-white transition-all"}
+      class={"flex w-full items-center gap-3 border-b border-gray-200 bg-white py-3 transition-all"}
     >
-      {/* アイテム本体（クリック可能） */}
+      {/* サムネイル画像 */}
       <button
         onClick={handleClick}
         disabled={props.isDraggable}
-        class={`flex flex-1 items-center gap-3 py-3 text-left transition-colors ${
-          props.isDraggable ? "" : "hover:bg-gray-50 active:bg-gray-100"
-        } ${props.isDraggable ? "pl-3" : "pl-3"}`}
+        class={`flex-shrink-0 pl-3 transition-opacity ${
+          props.isDraggable ? "" : "hover:opacity-80 active:opacity-60"
+        }`}
       >
-        {/* サムネイル画像（正方形クリップ） */}
         {props.item.photo ? (
-          <div class="bg-gray-80 relative size-9 flex-shrink-0 overflow-hidden rounded-lg">
+          <div class="relative size-12 overflow-hidden rounded-lg bg-gray-100">
             <img src={props.item.photo} alt={props.item.name} class="h-full w-full object-cover" />
           </div>
         ) : (
-          <div class="flex size-9 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100">
+          <div class="flex size-12 items-center justify-center rounded-lg bg-gray-100">
             <span class="text-3xl">📦</span>
           </div>
         )}
-
-        {/* 名前と所持数 */}
-        <div class="flex flex-1 flex-col gap-1">
-          <h3 class="text-base font-medium text-gray-900">{props.item.name}</h3>
-          <p class="text-sm text-gray-600">所持数: {props.item.quantity}</p>
-        </div>
       </button>
+
+      {/* 名前 */}
+      <button
+        onClick={handleClick}
+        disabled={props.isDraggable}
+        class={`flex-1 text-left transition-colors ${
+          props.isDraggable ? "" : "hover:text-blue-600 active:text-blue-700"
+        }`}
+      >
+        <h3 class="text-base font-medium text-gray-900">{props.item.name}</h3>
+      </button>
+
+      {/* 数量コントロール */}
+      {!props.isDraggable && (
+        <div class="flex items-center gap-2 pr-3">
+          <button
+            onClick={handleDecrement}
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 active:bg-gray-300"
+            disabled={props.item.quantity === 0}
+          >
+            <Minus size={16} />
+          </button>
+          <div class="flex flex-col items-center">
+            <span class="w-8 text-center text-sm font-medium text-gray-900">
+              {props.item.quantity}
+            </span>
+            <span class="text-[0.62rem] text-gray-600">所持数</span>
+          </div>
+          <button
+            onClick={handleIncrement}
+            class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 active:bg-gray-300"
+          >
+            <Plus size={16} />
+          </button>
+        </div>
+      )}
 
       {/* ドラッグハンドル（編集モード時のみ表示・右側） */}
       {props.isDraggable && (
