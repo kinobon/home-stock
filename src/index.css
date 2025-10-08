@@ -76,6 +76,11 @@ body,
   overscroll-behavior-x: none;
 }
 
+/* iOS Safe Area 対応 */
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 /* iOS: ロングプレス時のテキスト選択・コンテキストメニュー無効化 */
 button,
 a,

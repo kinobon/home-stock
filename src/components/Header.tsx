@@ -1,26 +1,8 @@
 import type { Component } from "solid-js";
-import {
-  state,
-  setSearchQuery,
-  setSortBy,
-  toggleSortOrder,
-  exportData,
-  setView,
-} from "../state/store";
-import { Home, Search, Download, Plus, ArrowUpDown } from "lucide-solid";
+import { state, setSearchQuery, setSortBy, toggleSortOrder, setView } from "../state/store";
+import { Home, Search, Plus, ArrowUpDown } from "lucide-solid";
 
 const Header: Component = () => {
-  const handleExport = () => {
-    const data = exportData();
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `home-stock-${new Date().toISOString().split("T")[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <header class="sticky top-0 z-10 bg-white shadow-md">
       <div class="mx-auto max-w-4xl px-4 py-3">
@@ -75,25 +57,16 @@ const Header: Component = () => {
               </button>
             </div>
 
-            {/* アクションボタン */}
-            <div class="flex items-center gap-2">
-              <button
-                onClick={handleExport}
-                class="flex items-center gap-1.5 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-green-700"
-              >
-                <Download size={16} />
-                エクスポート
-              </button>
-              <button
-                onClick={() => {
-                  setView("editor");
-                }}
-                class="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700"
-              >
-                <Plus size={16} />
-                新規追加
-              </button>
-            </div>
+            {/* 新規追加ボタン */}
+            <button
+              onClick={() => {
+                setView("editor");
+              }}
+              class="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700"
+            >
+              <Plus size={16} />
+              新規追加
+            </button>
           </div>
         </div>
       </div>

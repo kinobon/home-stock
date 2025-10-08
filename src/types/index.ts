@@ -18,6 +18,7 @@ export interface AppState {
   isAscending: boolean;
   selectedItemId?: ItemID;
   view: "list" | "editor";
+  currentTab: "items" | "settings";
 }
 
 export interface ExportData {

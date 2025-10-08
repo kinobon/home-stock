@@ -10,6 +10,7 @@ const initialState: AppState = {
   isAscending: true,
   selectedItemId: undefined,
   view: "list",
+  currentTab: "items",
 };
 
 export const [state, setState] = createStore<AppState>(initialState);
@@ -119,6 +120,10 @@ export function setSelectedItem(id?: string) {
 
 export function setView(view: "list" | "editor") {
   setState("view", view);
+}
+
+export function setCurrentTab(tab: "items" | "settings") {
+  setState("currentTab", tab);
 }
 
 // エクスポート/インポート
