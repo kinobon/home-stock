@@ -191,19 +191,33 @@ const EditorModal: Component = () => {
 
               {/* ファイル選択ボタン */}
               <div class="mt-3 flex flex-col gap-2">
-                <label class="mx-auto cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoChange}
-                    class="hidden"
-                    disabled={isProcessing()}
-                  />
-                  <span class="flex items-center gap-2 rounded-full border-2 border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 active:scale-95">
-                    <ImageIcon size={16} />
-                    {photo() ? "写真を変更" : "写真を選択"}
-                  </span>
-                </label>
+                <div class="flex items-center justify-center gap-2">
+                  <label class="cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoChange}
+                      class="hidden"
+                      disabled={isProcessing()}
+                    />
+                    <span class="flex items-center gap-2 rounded-full border-2 border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 active:scale-95">
+                      <ImageIcon size={16} />
+                      {photo() ? "写真を変更" : "写真を選択"}
+                    </span>
+                  </label>
+
+                  {/* 写真削除ボタン（写真がある場合のみ表示） */}
+                  <Show when={photo()}>
+                    <button
+                      onClick={() => setPhoto("")}
+                      class="flex items-center gap-1 rounded-full border-2 border-red-200 bg-white px-4 py-2.5 text-sm font-medium text-red-600 transition-all hover:bg-red-50 active:scale-95"
+                      type="button"
+                    >
+                      <X size={16} />
+                      削除
+                    </button>
+                  </Show>
+                </div>
 
                 <Show when={isProcessing()}>
                   <p class="flex items-center justify-center gap-1 text-sm text-gray-500">
