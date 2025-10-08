@@ -38,6 +38,23 @@ const ItemList: Component = () => {
     return items;
   });
 
+  // ドラッグ中の表示順序（視覚的フィードバック用）
+  const displayItems = createMemo(() => {
+    const items = filteredAndSortedItems();
+    const dragIdx = draggedIndex();
+    const overIdx = dragOverIndex();
+
+    if (dragIdx === null || overIdx === null || dragIdx === overIdx) {
+      return items;
+    }
+
+    // ドラッグ中は仮の並び替えを表示
+    const newOrder = [...items];
+    const [removed] = newOrder.splice(dragIdx, 1);
+    newOrder.splice(overIdx, 0, removed);
+    return newOrder;
+  });
+
   const handleDragStart = (index: number) => {
     if (!state.isEditMode) return;
     setDraggedIndex(index);
@@ -118,14 +135,14 @@ const ItemList: Component = () => {
         </div>
       ) : (
         <div class="flex flex-col border-t border-gray-200 bg-white">
-          <For each={filteredAndSortedItems()}>
+          <For each={displayItems()}>
             {(item, index) => (
               <ItemCard
                 item={item}
                 index={index()}
                 isDraggable={state.isEditMode}
                 isDragging={draggedIndex() === index()}
-                isDragOver={dragOverIndex() === index()}
+                isDragOver={false}
                 onDragStart={() => handleDragStart(index())}
                 onDragOver={(e) => handleDragOver(e, index())}
                 onDragEnd={handleDragEnd}

@@ -37,8 +37,8 @@ const ItemCard: Component<ItemCardProps> = (props) => {
       onTouchMove={props.onTouchMove}
       onTouchEnd={props.onTouchEnd}
       class={`flex w-full items-center gap-3 border-b border-gray-200 bg-white transition-all ${
-        props.isDragging ? "opacity-50" : ""
-      } ${props.isDragOver ? "border-t-4 border-t-blue-500" : ""}`}
+        props.isDragging ? "scale-105 opacity-60 shadow-lg" : ""
+      }`}
     >
       {/* ドラッグハンドル（編集モード時のみ表示） */}
       {props.isDraggable && (
