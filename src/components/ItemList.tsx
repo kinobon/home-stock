@@ -8,13 +8,23 @@ const ItemList: Component = () => {
   const [draggedIndex, setDraggedIndex] = createSignal<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = createSignal<number | null>(null);
   const [dragPosition, setDragPosition] = createSignal<{ x: number; y: number } | null>(null);
+  const [containerWidth, setContainerWidth] = createSignal<number>(0);
+  const [containerLeft, setContainerLeft] = createSignal<number>(0);
   let containerRef: HTMLDivElement | undefined;
+  let itemListRef: HTMLDivElement | undefined;
   let scrollContainerRef: HTMLElement | null = null;
   let autoScrollInterval: number | undefined;
 
   onMount(() => {
     // 親のスクロールコンテナを探す
     if (containerRef) {
+      // アイテムリストの実際の幅と位置を取得
+      if (itemListRef) {
+        const rect = itemListRef.getBoundingClientRect();
+        setContainerWidth(rect.width);
+        setContainerLeft(rect.left);
+      }
+
       let parent = containerRef.parentElement;
       while (parent) {
         const overflowY = window.getComputedStyle(parent).overflowY;
@@ -220,7 +230,7 @@ const ItemList: Component = () => {
             </p>
           </div>
         ) : (
-          <div class="flex flex-col border-t border-gray-200 bg-white">
+          <div ref={itemListRef} class="flex flex-col border-t border-gray-200 bg-white">
             <For each={displayItems()}>
               {(item, index) => (
                 <ItemCard
@@ -244,21 +254,24 @@ const ItemList: Component = () => {
       </div>
 
       {/* ドラッグ中のゴースト要素 */}
-      <Show when={draggedIndex() !== null && dragPosition()}>
+      <Show when={draggedIndex() !== null && dragPosition() && containerWidth() > 0}>
         <Portal>
           <div
             class="pointer-events-none fixed z-50"
             style={{
-              left: `${dragPosition()!.x}px`,
+              left: `${containerLeft()}px`,
               top: `${dragPosition()!.y}px`,
-              transform: "translate(-50%, -50%)",
+              width: `${containerWidth()}px`,
+              transform: "translateY(-50%)",
+              "box-shadow":
+                "0 -8px 15px -3px rgba(0, 0, 0, 0.06), 0 8px 15px -3px rgba(0, 0, 0, 0.06), 0 -2px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 6px -1px rgba(0, 0, 0, 0.03)",
             }}
           >
-            <div class="w-80 scale-105 opacity-90 shadow-2xl">
+            <div class="opacity-90">
               <ItemCard
                 item={filteredAndSortedItems()[draggedIndex()!]}
                 index={draggedIndex()!}
-                isDraggable={false}
+                isDraggable={true}
                 isDragging={false}
                 isDragOver={false}
                 onDragStart={() => {}}
