@@ -3,6 +3,9 @@ import solid from "vite-plugin-solid";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
+  optimizeDeps: {
+    exclude: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime"],
+  },
   plugins: [
     solid(),
     VitePWA({
