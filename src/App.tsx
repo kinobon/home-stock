@@ -51,7 +51,7 @@ const App: Component = () => {
   });
 
   return (
-    <div class="flex h-full flex-col overflow-hidden bg-gray-50">
+    <div class="flex h-dvh flex-col overflow-hidden bg-gray-50">
       {/* ヘッダーは備品一覧タブのみ表示 */}
       <Show when={state.currentTab === "items"}>
         <Header />
