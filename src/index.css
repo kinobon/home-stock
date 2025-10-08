@@ -16,13 +16,24 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html,
+body {
+  height: 100%;
+  touch-action: pan-x pan-y;
+}
+
+/* iOS: 100vh問題を修正 */
+html {
+  height: -webkit-fill-available;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  min-height: -webkit-fill-available;
   overflow-y: auto;
   overflow-x: hidden;
-  touch-action: pan-x pan-y;
 }
 
 * {
