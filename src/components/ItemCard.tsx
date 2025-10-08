@@ -33,9 +33,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
       onDragOver={props.onDragOver}
       onDragEnd={props.onDragEnd}
       onDragLeave={props.onDragLeave}
-      class={`flex w-full items-center gap-3 border-b border-gray-200 bg-white transition-all ${
-        props.isDragging ? "scale-105 opacity-60 shadow-lg" : ""
-      }`}
+      class={"flex w-full items-center gap-3 border-b border-gray-200 bg-white transition-all"}
     >
       {/* アイテム本体（クリック可能） */}
       <button

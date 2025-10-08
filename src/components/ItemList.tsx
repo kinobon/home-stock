@@ -1,4 +1,5 @@
-import { For, createMemo, createSignal, onMount, onCleanup, type Component } from "solid-js";
+import { For, createMemo, createSignal, onMount, onCleanup, Show, type Component } from "solid-js";
+import { Portal } from "solid-js/web";
 import { state, reorderItems } from "../state/store";
 import ItemCard from "./ItemCard";
 import { Package, Plus } from "lucide-solid";
@@ -6,6 +7,7 @@ import { Package, Plus } from "lucide-solid";
 const ItemList: Component = () => {
   const [draggedIndex, setDraggedIndex] = createSignal<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = createSignal<number | null>(null);
+  const [dragPosition, setDragPosition] = createSignal<{ x: number; y: number } | null>(null);
   let containerRef: HTMLDivElement | undefined;
   let scrollContainerRef: HTMLElement | null = null;
   let autoScrollInterval: number | undefined;
@@ -121,6 +123,11 @@ const ItemList: Component = () => {
     if (!state.isEditMode) return;
     e.stopPropagation(); // イベント伝播を停止
     setDraggedIndex(index);
+
+    const touch = e.touches[0];
+    if (touch) {
+      setDragPosition({ x: touch.clientX, y: touch.clientY });
+    }
   };
 
   const handleHandleTouchMove = (e: TouchEvent) => {
@@ -129,6 +136,9 @@ const ItemList: Component = () => {
 
     const touch = e.touches[0];
     if (!touch) return;
+
+    // ドラッグ位置を更新
+    setDragPosition({ x: touch.clientX, y: touch.clientY });
 
     // 自動スクロール処理
     if (scrollContainerRef) {
@@ -191,43 +201,79 @@ const ItemList: Component = () => {
       autoScrollInterval = undefined;
     }
 
+    // ドラッグ位置をクリア
+    setDragPosition(null);
+
     handleDragEnd();
   };
 
   return (
-    <div ref={containerRef} class="mx-auto max-w-4xl">
-      {filteredAndSortedItems().length === 0 ? (
-        <div class="flex flex-col items-center justify-center py-16 text-center text-gray-500">
-          <Package size={64} class="mb-4 text-gray-300" />
-          <p class="text-lg font-medium">アイテムがありません</p>
-          <p class="mt-2 flex items-center gap-1 text-sm">
-            <Plus size={16} />
-            「新規追加」から備品を登録してください
-          </p>
-        </div>
-      ) : (
-        <div class="flex flex-col border-t border-gray-200 bg-white">
-          <For each={displayItems()}>
-            {(item, index) => (
+    <>
+      <div ref={containerRef} class="mx-auto max-w-4xl">
+        {filteredAndSortedItems().length === 0 ? (
+          <div class="flex flex-col items-center justify-center py-16 text-center text-gray-500">
+            <Package size={64} class="mb-4 text-gray-300" />
+            <p class="text-lg font-medium">アイテムがありません</p>
+            <p class="mt-2 flex items-center gap-1 text-sm">
+              <Plus size={16} />
+              「新規追加」から備品を登録してください
+            </p>
+          </div>
+        ) : (
+          <div class="flex flex-col border-t border-gray-200 bg-white">
+            <For each={displayItems()}>
+              {(item, index) => (
+                <ItemCard
+                  item={item}
+                  index={index()}
+                  isDraggable={state.isEditMode}
+                  isDragging={draggedIndex() === index()}
+                  isDragOver={false}
+                  onDragStart={() => handleDragStart(index())}
+                  onDragOver={(e) => handleDragOver(e, index())}
+                  onDragEnd={handleDragEnd}
+                  onDragLeave={handleDragLeave}
+                  onHandleTouchStart={(e) => handleHandleTouchStart(index(), e)}
+                  onHandleTouchMove={handleHandleTouchMove}
+                  onHandleTouchEnd={handleHandleTouchEnd}
+                />
+              )}
+            </For>
+          </div>
+        )}
+      </div>
+
+      {/* ドラッグ中のゴースト要素 */}
+      <Show when={draggedIndex() !== null && dragPosition()}>
+        <Portal>
+          <div
+            class="pointer-events-none fixed z-50"
+            style={{
+              left: `${dragPosition()!.x}px`,
+              top: `${dragPosition()!.y}px`,
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            <div class="w-80 scale-105 opacity-90 shadow-2xl">
               <ItemCard
-                item={item}
-                index={index()}
-                isDraggable={state.isEditMode}
-                isDragging={draggedIndex() === index()}
+                item={filteredAndSortedItems()[draggedIndex()!]}
+                index={draggedIndex()!}
+                isDraggable={false}
+                isDragging={false}
                 isDragOver={false}
-                onDragStart={() => handleDragStart(index())}
-                onDragOver={(e) => handleDragOver(e, index())}
-                onDragEnd={handleDragEnd}
-                onDragLeave={handleDragLeave}
-                onHandleTouchStart={(e) => handleHandleTouchStart(index(), e)}
-                onHandleTouchMove={handleHandleTouchMove}
-                onHandleTouchEnd={handleHandleTouchEnd}
+                onDragStart={() => {}}
+                onDragOver={() => {}}
+                onDragEnd={() => {}}
+                onDragLeave={() => {}}
+                onHandleTouchStart={() => {}}
+                onHandleTouchMove={() => {}}
+                onHandleTouchEnd={() => {}}
               />
-            )}
-          </For>
-        </div>
-      )}
-    </div>
+            </div>
+          </div>
+        </Portal>
+      </Show>
+    </>
   );
 };
 
