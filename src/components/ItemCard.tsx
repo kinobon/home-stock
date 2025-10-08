@@ -37,25 +37,13 @@ const ItemCard: Component<ItemCardProps> = (props) => {
         props.isDragging ? "scale-105 opacity-60 shadow-lg" : ""
       }`}
     >
-      {/* ドラッグハンドル（編集モード時のみ表示） */}
-      {props.isDraggable && (
-        <div
-          class="flex h-full cursor-grab touch-none items-center px-2 text-gray-400 active:cursor-grabbing"
-          onTouchStart={props.onHandleTouchStart}
-          onTouchMove={props.onHandleTouchMove}
-          onTouchEnd={props.onHandleTouchEnd}
-        >
-          <GripVertical size={20} />
-        </div>
-      )}
-
       {/* アイテム本体（クリック可能） */}
       <button
         onClick={handleClick}
         disabled={props.isDraggable}
-        class={`flex flex-1 items-center gap-3 py-3 pr-3 text-left transition-colors ${
-          props.isDraggable ? "cursor-move" : "hover:bg-gray-50 active:bg-gray-100"
-        } ${!props.isDraggable ? "pl-3" : ""}`}
+        class={`flex flex-1 items-center gap-3 py-3 text-left transition-colors ${
+          props.isDraggable ? "" : "hover:bg-gray-50 active:bg-gray-100"
+        } ${props.isDraggable ? "pl-3" : "pl-3"}`}
       >
         {/* サムネイル画像（正方形クリップ） */}
         {props.item.photo ? (
@@ -74,6 +62,18 @@ const ItemCard: Component<ItemCardProps> = (props) => {
           <p class="text-sm text-gray-600">所持数: {props.item.quantity}</p>
         </div>
       </button>
+
+      {/* ドラッグハンドル（編集モード時のみ表示・右側） */}
+      {props.isDraggable && (
+        <div
+          class="flex h-full cursor-grab touch-none items-center px-2 text-gray-400 active:cursor-grabbing"
+          onTouchStart={props.onHandleTouchStart}
+          onTouchMove={props.onHandleTouchMove}
+          onTouchEnd={props.onHandleTouchEnd}
+        >
+          <GripVertical size={20} />
+        </div>
+      )}
     </div>
   );
 };
