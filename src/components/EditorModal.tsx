@@ -172,28 +172,46 @@ const EditorModal: Component = () => {
                 <ImageIcon size={16} />
                 写真
               </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handlePhotoChange}
-                class="w-full rounded-lg border-2 border-gray-300 px-3 py-2.5 text-sm transition-all focus:border-blue-500 focus:outline-none"
-                disabled={isProcessing()}
-              />
-              <Show when={photo()}>
-                <div class="mx-auto mt-3 w-full max-w-xs">
-                  <img
-                    src={photo()}
-                    alt="Preview"
-                    class="aspect-square w-full rounded-lg object-cover"
-                  />
+
+              {/* 写真プレビュー枠（常に表示） */}
+              <div class="mx-auto w-full max-w-xs">
+                <div class="aspect-square w-full overflow-hidden rounded-lg border-2 border-gray-300 bg-gray-50">
+                  <Show
+                    when={photo()}
+                    fallback={
+                      <div class="flex h-full w-full items-center justify-center text-gray-400">
+                        <ImageIcon size={48} />
+                      </div>
+                    }
+                  >
+                    <img src={photo()} alt="Preview" class="h-full w-full object-cover" />
+                  </Show>
                 </div>
-              </Show>
-              <Show when={isProcessing()}>
-                <p class="mt-2 flex items-center gap-1 text-sm text-gray-500">
-                  <Loader2 size={16} class="animate-spin" />
-                  画像を処理中...
-                </p>
-              </Show>
+              </div>
+
+              {/* ファイル選択ボタン */}
+              <div class="mt-3 flex flex-col gap-2">
+                <label class="mx-auto cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoChange}
+                    class="hidden"
+                    disabled={isProcessing()}
+                  />
+                  <span class="flex items-center gap-2 rounded-full border-2 border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 active:scale-95">
+                    <ImageIcon size={16} />
+                    {photo() ? "写真を変更" : "写真を選択"}
+                  </span>
+                </label>
+
+                <Show when={isProcessing()}>
+                  <p class="flex items-center justify-center gap-1 text-sm text-gray-500">
+                    <Loader2 size={16} class="animate-spin" />
+                    画像を処理中...
+                  </p>
+                </Show>
+              </div>
             </div>
           </div>
 
