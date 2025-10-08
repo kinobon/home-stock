@@ -134,6 +134,13 @@ const ItemList: Component = () => {
     e.stopPropagation(); // イベント伝播を停止
     setDraggedIndex(index);
 
+    // ドラッグ開始時にコンテナの幅と位置を取得
+    if (itemListRef) {
+      const rect = itemListRef.getBoundingClientRect();
+      setContainerWidth(rect.width);
+      setContainerLeft(rect.left);
+    }
+
     const touch = e.touches[0];
     if (touch) {
       setDragPosition({ x: touch.clientX, y: touch.clientY });
