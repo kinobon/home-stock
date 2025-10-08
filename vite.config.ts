@@ -31,8 +31,6 @@ export default defineConfig({
         theme_color: "#ffffff",
         background_color: "#ffffff",
         display: "standalone",
-        start_url: "/home-stock/",
-        scope: "/home-stock/",
         icons: [
           {
             src: "pwa-192x192.png",
@@ -67,7 +65,7 @@ export default defineConfig({
       },
     }),
   ],
-  base: "/home-stock/",
+  base: process.env.NODE_ENV === "production" ? "/home-stock/" : "/",
   server: {
     host: true,
     port: 5173,
