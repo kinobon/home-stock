@@ -5,6 +5,7 @@ import { GripVertical } from "lucide-solid";
 
 interface ItemCardProps {
   item: Item;
+  index: number;
   isDraggable: boolean;
   isDragging: boolean;
   isDragOver: boolean;
@@ -12,6 +13,9 @@ interface ItemCardProps {
   onDragOver: (e: DragEvent) => void;
   onDragEnd: () => void;
   onDragLeave: () => void;
+  onTouchStart: (e: TouchEvent) => void;
+  onTouchMove: (e: TouchEvent) => void;
+  onTouchEnd: () => void;
 }
 
 const ItemCard: Component<ItemCardProps> = (props) => {
@@ -23,11 +27,15 @@ const ItemCard: Component<ItemCardProps> = (props) => {
 
   return (
     <div
+      data-item-index={props.index}
       draggable={props.isDraggable}
       onDragStart={props.onDragStart}
       onDragOver={props.onDragOver}
       onDragEnd={props.onDragEnd}
       onDragLeave={props.onDragLeave}
+      onTouchStart={props.onTouchStart}
+      onTouchMove={props.onTouchMove}
+      onTouchEnd={props.onTouchEnd}
       class={`flex w-full items-center gap-3 border-b border-gray-200 bg-white transition-all ${
         props.isDragging ? "opacity-50" : ""
       } ${props.isDragOver ? "border-t-4 border-t-blue-500" : ""}`}

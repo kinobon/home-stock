@@ -73,6 +73,38 @@ const ItemList: Component = () => {
     setDragOverIndex(null);
   };
 
+  // タッチイベントハンドラー
+  const handleTouchStart = (index: number, _e: TouchEvent) => {
+    if (!state.isEditMode) return;
+    setDraggedIndex(index);
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (!state.isEditMode || draggedIndex() === null) return;
+    e.preventDefault(); // スクロール防止
+
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    // タッチ位置から該当する要素を取得
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (!element) return;
+
+    // 最も近いItemCard要素を探す
+    const itemCard = element.closest("[data-item-index]");
+    if (itemCard) {
+      const index = parseInt(itemCard.getAttribute("data-item-index") || "-1");
+      if (index >= 0) {
+        setDragOverIndex(index);
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!state.isEditMode) return;
+    handleDragEnd();
+  };
+
   return (
     <div class="mx-auto max-w-4xl px-4 pt-6 pb-20">
       {filteredAndSortedItems().length === 0 ? (
@@ -90,6 +122,7 @@ const ItemList: Component = () => {
             {(item, index) => (
               <ItemCard
                 item={item}
+                index={index()}
                 isDraggable={state.isEditMode}
                 isDragging={draggedIndex() === index()}
                 isDragOver={dragOverIndex() === index()}
@@ -97,6 +130,9 @@ const ItemList: Component = () => {
                 onDragOver={(e) => handleDragOver(e, index())}
                 onDragEnd={handleDragEnd}
                 onDragLeave={handleDragLeave}
+                onTouchStart={(e) => handleTouchStart(index(), e)}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
               />
             )}
           </For>
