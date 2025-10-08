@@ -78,9 +78,24 @@ pnpm format:check
 
 ## 📱 PWA Setup
 
-1. **アイコン準備**: `public/` に `pwa-192x192.png` と `pwa-512x512.png` を配置
-2. **ビルド**: `pnpm build`
-3. **デプロイ**: GitHub Pages または任意のホスティング
+### アイコンとスプラッシュスクリーン生成
+
+PWA用のアイコンとiOS用スプラッシュスクリーンを自動生成:
+
+```bash
+# 1. public/icon.png を準備（推奨: 1024x1024px以上）
+# 2. 生成コマンドを実行
+pnpm run generate:pwa
+```
+
+生成されるファイル:
+- **App Icons**: 152x152, 167x167, 180x180, 192x192, 512x512
+- **iOS Splash Screens**: iPhone/iPad の各サイズ（11種類）
+
+### ビルドとデプロイ
+
+1. **ビルド**: `pnpm build`
+2. **デプロイ**: GitHub Pages または任意のホスティング
 
 ---
 
