@@ -124,112 +124,135 @@ const EditorModal: Component = () => {
   return (
     <>
       <Show when={state.view === "editor"}>
-        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-          <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <h2 class="mb-4 flex items-center gap-2 text-xl font-bold">
-              {currentItem() ? (
-                <>
-                  <Edit size={24} />
-                  編集
-                </>
-              ) : (
-                <>
-                  <Plus size={24} />
-                  新規追加
-                </>
-              )}
-            </h2>
+        <div class="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm md:items-center md:p-4">
+          <div class="flex h-[100dvh] w-full flex-col bg-white md:h-auto md:max-w-lg md:rounded-2xl md:shadow-2xl">
+            {/* ヘッダー */}
+            <div class="flex items-center justify-between border-b border-gray-200 p-4">
+              <h2 class="flex items-center gap-2 text-lg font-bold md:text-xl">
+                {currentItem() ? (
+                  <>
+                    <Edit size={20} class="md:hidden" />
+                    <Edit size={24} class="hidden md:block" />
+                    編集
+                  </>
+                ) : (
+                  <>
+                    <Plus size={20} class="md:hidden" />
+                    <Plus size={24} class="hidden md:block" />
+                    新規追加
+                  </>
+                )}
+              </h2>
+              <button
+                onClick={handleClose}
+                class="rounded-full p-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
+              >
+                <X size={20} />
+              </button>
+            </div>
 
-            <div class="space-y-4">
-              {/* 名前 */}
-              <div>
-                <label class="mb-1 block text-sm font-medium text-gray-700">
-                  名前 <span class="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={name()}
-                  onInput={(e) => setName(e.currentTarget.value)}
-                  class="w-full rounded-lg border-2 border-gray-300 bg-gray-50 px-4 py-3 transition-all focus:border-blue-500 focus:bg-white focus:shadow-md focus:outline-none"
-                  placeholder="例: 入浴剤(ゆず)"
-                />
-              </div>
-
-              {/* 数量 */}
-              <div>
-                <label class="mb-1 block text-sm font-medium text-gray-700">数量</label>
-                <div class="flex justify-center">
-                  <QuantityStepper value={quantity()} onChange={setQuantity} min={0} />
+            {/* フォーム（スクロール可能） */}
+            <div class="flex-1 overflow-y-auto overscroll-contain p-4">
+              <div class="space-y-5">
+                {/* 名前 */}
+                <div>
+                  <label class="mb-2 block text-sm font-medium text-gray-700">
+                    名前 <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={name()}
+                    onInput={(e) => setName(e.currentTarget.value)}
+                    class="w-full rounded-lg border-2 border-gray-300 bg-gray-50 px-4 py-3 text-base transition-all focus:border-blue-500 focus:bg-white focus:outline-none md:py-2.5 md:text-sm"
+                    placeholder="例: 入浴剤(ゆず)"
+                  />
                 </div>
-              </div>
 
-              {/* メモ */}
-              <div>
-                <label class="mb-1 block text-sm font-medium text-gray-700">メモ</label>
-                <textarea
-                  value={memo()}
-                  onInput={(e) => setMemo(e.currentTarget.value)}
-                  class="w-full rounded-lg border-2 border-gray-300 bg-gray-50 px-4 py-3 transition-all focus:border-blue-500 focus:bg-white focus:shadow-md focus:outline-none"
-                  rows="3"
-                  placeholder="補足情報など"
-                />
-              </div>
+                {/* 数量 */}
+                <div>
+                  <label class="mb-2 block text-sm font-medium text-gray-700">数量</label>
+                  <div class="flex justify-center">
+                    <QuantityStepper value={quantity()} onChange={setQuantity} min={0} />
+                  </div>
+                </div>
 
-              {/* 写真 */}
-              <div>
-                <label class="mb-1 flex items-center gap-1 text-sm font-medium text-gray-700">
-                  <ImageIcon size={16} />
-                  写真
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoChange}
-                  class="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-                  disabled={isProcessing()}
-                />
-                <Show when={photo()}>
-                  <img src={photo()} alt="Preview" class="mt-2 h-32 w-full rounded object-cover" />
-                </Show>
-                <Show when={isProcessing()}>
-                  <p class="mt-2 flex items-center gap-1 text-sm text-gray-500">
-                    <Loader2 size={16} class="animate-spin" />
-                    画像を処理中...
-                  </p>
-                </Show>
+                {/* メモ */}
+                <div>
+                  <label class="mb-2 block text-sm font-medium text-gray-700">メモ</label>
+                  <textarea
+                    value={memo()}
+                    onInput={(e) => setMemo(e.currentTarget.value)}
+                    class="w-full rounded-lg border-2 border-gray-300 bg-gray-50 px-4 py-3 text-base transition-all focus:border-blue-500 focus:bg-white focus:outline-none md:py-2.5 md:text-sm"
+                    rows="3"
+                    placeholder="補足情報など"
+                  />
+                </div>
+
+                {/* 写真 */}
+                <div>
+                  <label class="mb-2 flex items-center gap-1 text-sm font-medium text-gray-700">
+                    <ImageIcon size={16} />
+                    写真
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoChange}
+                    class="w-full rounded-lg border-2 border-gray-300 px-3 py-2.5 text-sm transition-all focus:border-blue-500 focus:outline-none"
+                    disabled={isProcessing()}
+                  />
+                  <Show when={photo()}>
+                    <img
+                      src={photo()}
+                      alt="Preview"
+                      class="mt-3 h-40 w-full rounded-lg object-cover md:h-32"
+                    />
+                  </Show>
+                  <Show when={isProcessing()}>
+                    <p class="mt-2 flex items-center gap-1 text-sm text-gray-500">
+                      <Loader2 size={16} class="animate-spin" />
+                      画像を処理中...
+                    </p>
+                  </Show>
+                </div>
               </div>
             </div>
 
-            {/* ボタン */}
-            <div class="mt-6 flex flex-col gap-3">
-              <div class="flex gap-3">
-                <button
-                  onClick={handleClose}
-                  class="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-gray-300 py-3 font-medium text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50"
-                >
-                  <X size={18} />
-                  キャンセル
-                </button>
-                <button
-                  onClick={handleSave}
-                  class="flex flex-1 items-center justify-center gap-2 rounded-full bg-blue-600 py-3 font-medium text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg disabled:cursor-not-allowed disabled:bg-gray-300 disabled:shadow-none"
-                  disabled={isProcessing()}
-                >
-                  <Save size={18} />
-                  保存
-                </button>
-              </div>
+            {/* ボタン（固定フッター） */}
+            <div class="border-t border-gray-200 bg-white p-4">
+              <div class="flex flex-col gap-3">
+                <div class="flex gap-3">
+                  <button
+                    onClick={handleClose}
+                    class="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-gray-300 py-3.5 font-medium text-gray-700 transition-all active:scale-95 md:py-3"
+                  >
+                    <X size={20} class="md:hidden" />
+                    <X size={18} class="hidden md:block" />
+                    キャンセル
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    class="flex flex-1 items-center justify-center gap-2 rounded-full bg-blue-600 py-3.5 font-medium text-white transition-all active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300 md:py-3"
+                    disabled={isProcessing()}
+                  >
+                    <Save size={20} class="md:hidden" />
+                    <Save size={18} class="hidden md:block" />
+                    保存
+                  </button>
+                </div>
 
-              {/* 削除ボタン（編集時のみ表示） */}
-              <Show when={currentItem()}>
-                <button
-                  onClick={handleDelete}
-                  class="flex w-full items-center justify-center gap-2 rounded-full border-2 border-red-200 py-3 font-medium text-red-600 transition-all hover:border-red-300 hover:bg-red-50"
-                >
-                  <Trash2 size={18} />
-                  削除
-                </button>
-              </Show>
+                {/* 削除ボタン（編集時のみ表示） */}
+                <Show when={currentItem()}>
+                  <button
+                    onClick={handleDelete}
+                    class="flex w-full items-center justify-center gap-2 rounded-full border-2 border-red-200 py-3.5 font-medium text-red-600 transition-all active:scale-95 md:py-3"
+                  >
+                    <Trash2 size={20} class="md:hidden" />
+                    <Trash2 size={18} class="hidden md:block" />
+                    削除
+                  </button>
+                </Show>
+              </div>
             </div>
           </div>
         </div>

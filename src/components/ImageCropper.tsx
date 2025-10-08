@@ -92,38 +92,45 @@ const ImageCropper: Component<ImageCropperProps> = (props) => {
   };
 
   return (
-    <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4">
-      <div class="flex w-full max-w-3xl flex-col rounded-2xl bg-white p-4">
-        <div class="mb-3 flex items-center justify-between">
-          <h3 class="text-lg font-bold">画像をクロップ</h3>
+    <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-0 md:p-4">
+      <div class="flex h-full w-full flex-col bg-white md:h-auto md:max-w-3xl md:rounded-2xl">
+        {/* ヘッダー */}
+        <div class="flex items-center justify-between border-b border-gray-200 p-4">
+          <h3 class="text-base font-bold md:text-lg">画像をクロップ</h3>
           <button
             onClick={props.onCancel}
-            class="rounded-full p-2 transition-colors hover:bg-gray-100"
+            class="rounded-full p-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
           >
             <X size={20} />
           </button>
         </div>
 
-        <div class="mb-4 max-h-[60vh] overflow-hidden rounded-lg bg-gray-100">
+        {/* クロップエリア */}
+        <div class="flex-1 overflow-hidden bg-gray-900">
           <img ref={imageRef} src={props.imageUrl} alt="Crop" class="max-w-full" />
         </div>
 
-        <div class="flex gap-3">
-          <button
-            onClick={props.onCancel}
-            class="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-gray-300 py-3 font-medium text-gray-700 transition-all hover:border-gray-400 hover:bg-gray-50"
-          >
-            <X size={18} />
-            キャンセル
-          </button>
-          <button
-            onClick={handleCrop}
-            class="flex flex-1 items-center justify-center gap-2 rounded-full bg-blue-600 py-3 font-medium text-white transition-all hover:bg-blue-700 disabled:bg-gray-300"
-            disabled={isProcessing()}
-          >
-            <Check size={18} />
-            {isProcessing() ? "処理中..." : "クロップ"}
-          </button>
+        {/* ボタン */}
+        <div class="border-t border-gray-200 bg-white p-4">
+          <div class="flex gap-3">
+            <button
+              onClick={props.onCancel}
+              class="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-gray-300 py-3.5 font-medium text-gray-700 transition-all active:scale-95 md:py-3"
+            >
+              <X size={20} class="md:hidden" />
+              <X size={18} class="hidden md:block" />
+              キャンセル
+            </button>
+            <button
+              onClick={handleCrop}
+              class="flex flex-1 items-center justify-center gap-2 rounded-full bg-blue-600 py-3.5 font-medium text-white transition-all active:scale-95 disabled:bg-gray-300 md:py-3"
+              disabled={isProcessing()}
+            >
+              <Check size={20} class="md:hidden" />
+              <Check size={18} class="hidden md:block" />
+              {isProcessing() ? "処理中..." : "クロップ"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
