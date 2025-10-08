@@ -180,11 +180,13 @@ const EditorModal: Component = () => {
                 disabled={isProcessing()}
               />
               <Show when={photo()}>
-                <img
-                  src={photo()}
-                  alt="Preview"
-                  class="mt-3 h-40 w-full rounded-lg object-cover md:h-32"
-                />
+                <div class="mx-auto mt-3 w-full max-w-xs">
+                  <img
+                    src={photo()}
+                    alt="Preview"
+                    class="aspect-square w-full rounded-lg object-cover"
+                  />
+                </div>
               </Show>
               <Show when={isProcessing()}>
                 <p class="mt-2 flex items-center gap-1 text-sm text-gray-500">
