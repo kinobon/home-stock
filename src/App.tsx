@@ -5,6 +5,7 @@ import ItemList from "./components/ItemList";
 import EditorModal from "./components/EditorModal";
 import BottomNav from "./components/BottomNav";
 import Settings from "./components/Settings";
+import FAB from "./components/FAB";
 import { useIOSScrollDebounce, optimizeTouchEvents } from "./utils/scroll";
 
 const App: Component = () => {
@@ -35,6 +36,11 @@ const App: Component = () => {
       </Show>
       <Show when={state.currentTab === "settings"}>
         <Settings />
+      </Show>
+
+      {/* FAB（備品一覧タブのみ表示） */}
+      <Show when={state.currentTab === "items"}>
+        <FAB />
       </Show>
 
       {/* モーダル */}

@@ -1,13 +1,6 @@
 import type { Component } from "solid-js";
-import {
-  state,
-  setSearchQuery,
-  setSortBy,
-  toggleSortOrder,
-  setView,
-  setEditMode,
-} from "../state/store";
-import { Home, Search, Plus, ArrowUpDown, Edit3, Check } from "lucide-solid";
+import { state, setSearchQuery, setSortBy, toggleSortOrder, setEditMode } from "../state/store";
+import { Home, Search, ArrowUpDown, Edit3, Check } from "lucide-solid";
 
 const Header: Component = () => {
   return (
@@ -80,42 +73,29 @@ const Header: Component = () => {
             </div>
 
             {/* 右側ボタングループ */}
-            <div class="flex items-center gap-2">
-              {/* 編集モード切り替えボタン（カスタムソート時のみ表示） */}
-              {state.sortBy === "custom" && (
-                <button
-                  onClick={() => setEditMode(!state.isEditMode)}
-                  class={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium shadow-sm transition-all ${
-                    state.isEditMode
-                      ? "bg-green-600 text-white hover:bg-green-700"
-                      : "bg-gray-600 text-white hover:bg-gray-700"
-                  }`}
-                >
-                  {state.isEditMode ? (
-                    <>
-                      <Check size={16} />
-                      完了
-                    </>
-                  ) : (
-                    <>
-                      <Edit3 size={16} />
-                      並び替え
-                    </>
-                  )}
-                </button>
-              )}
-
-              {/* 新規追加ボタン */}
+            {/* 編集モード切り替えボタン（カスタムソート時のみ表示） */}
+            {state.sortBy === "custom" && (
               <button
-                onClick={() => {
-                  setView("editor");
-                }}
-                class="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700"
+                onClick={() => setEditMode(!state.isEditMode)}
+                class={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium shadow-sm transition-all ${
+                  state.isEditMode
+                    ? "bg-green-600 text-white hover:bg-green-700"
+                    : "bg-gray-600 text-white hover:bg-gray-700"
+                }`}
               >
-                <Plus size={16} />
-                新規追加
+                {state.isEditMode ? (
+                  <>
+                    <Check size={16} />
+                    完了
+                  </>
+                ) : (
+                  <>
+                    <Edit3 size={16} />
+                    並び替え
+                  </>
+                )}
               </button>
-            </div>
+            )}
           </div>
         </div>
       </div>
