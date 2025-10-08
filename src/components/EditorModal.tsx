@@ -128,9 +128,44 @@ const EditorModal: Component = () => {
         isOpen={state.view === "editor"}
         onClose={handleClose}
         title={currentItem() ? "編集" : "新規追加"}
+        footer={
+          <div class="flex flex-col gap-3">
+            <div class="flex gap-3">
+              <button
+                onClick={handleClose}
+                class="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-gray-300 py-3.5 font-medium text-gray-700 transition-all active:scale-95 md:py-3"
+              >
+                <X size={20} class="md:hidden" />
+                <X size={18} class="hidden md:block" />
+                キャンセル
+              </button>
+              <button
+                onClick={handleSave}
+                class="flex flex-1 items-center justify-center gap-2 rounded-full bg-blue-600 py-3.5 font-medium text-white transition-all active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300 md:py-3"
+                disabled={isProcessing()}
+              >
+                <Save size={20} class="md:hidden" />
+                <Save size={18} class="hidden md:block" />
+                保存
+              </button>
+            </div>
+
+            {/* 削除ボタン（編集時のみ表示） */}
+            <Show when={currentItem()}>
+              <button
+                onClick={handleDelete}
+                class="flex w-full items-center justify-center gap-2 rounded-full border-2 border-red-200 py-3.5 font-medium text-red-600 transition-all active:scale-95 md:py-3"
+              >
+                <Trash2 size={20} class="md:hidden" />
+                <Trash2 size={18} class="hidden md:block" />
+                削除
+              </button>
+            </Show>
+          </div>
+        }
       >
         {/* フォーム */}
-        <div class="p-4">
+        <div class="p-4 pb-0">
           <div class="space-y-5">
             {/* 名前 */}
             <div>
@@ -227,41 +262,6 @@ const EditorModal: Component = () => {
                 </Show>
               </div>
             </div>
-          </div>
-
-          {/* ボタン */}
-          <div class="mt-6 flex flex-col gap-3">
-            <div class="flex gap-3">
-              <button
-                onClick={handleClose}
-                class="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-gray-300 py-3.5 font-medium text-gray-700 transition-all active:scale-95 md:py-3"
-              >
-                <X size={20} class="md:hidden" />
-                <X size={18} class="hidden md:block" />
-                キャンセル
-              </button>
-              <button
-                onClick={handleSave}
-                class="flex flex-1 items-center justify-center gap-2 rounded-full bg-blue-600 py-3.5 font-medium text-white transition-all active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300 md:py-3"
-                disabled={isProcessing()}
-              >
-                <Save size={20} class="md:hidden" />
-                <Save size={18} class="hidden md:block" />
-                保存
-              </button>
-            </div>
-
-            {/* 削除ボタン（編集時のみ表示） */}
-            <Show when={currentItem()}>
-              <button
-                onClick={handleDelete}
-                class="flex w-full items-center justify-center gap-2 rounded-full border-2 border-red-200 py-3.5 font-medium text-red-600 transition-all active:scale-95 md:py-3"
-              >
-                <Trash2 size={20} class="md:hidden" />
-                <Trash2 size={18} class="hidden md:block" />
-                削除
-              </button>
-            </Show>
           </div>
         </div>
       </FullScreenModal>

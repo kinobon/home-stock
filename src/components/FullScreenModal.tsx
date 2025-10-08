@@ -8,6 +8,7 @@ interface FullScreenModalProps {
   onClose: () => void;
   children: JSX.Element;
   title: string;
+  footer?: JSX.Element;
 }
 
 const FullScreenModal: Component<FullScreenModalProps> = (props) => {
@@ -54,6 +55,11 @@ const FullScreenModal: Component<FullScreenModalProps> = (props) => {
 
           {/* コンテンツ（スクロール可能） */}
           <div class="flex-1 overflow-y-auto">{props.children}</div>
+
+          {/* フッター（固定） */}
+          <Show when={props.footer}>
+            <div class="border-t border-gray-200 bg-white p-4">{props.footer}</div>
+          </Show>
         </div>
       </Portal>
     </Show>
