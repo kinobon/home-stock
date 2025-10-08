@@ -15,7 +15,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
   return (
     <button
       onClick={handleClick}
-      class="flex w-full items-center gap-3 rounded-lg bg-white p-3 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.98]"
+      class="flex w-full items-center gap-3 border-b border-gray-200 bg-white p-3 text-left transition-colors hover:bg-gray-50 active:bg-gray-100"
     >
       {/* サムネイル画像（正方形クリップ） */}
       {props.item.photo ? (

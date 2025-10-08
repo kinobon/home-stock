@@ -31,7 +31,7 @@ const ItemList: Component = () => {
   });
 
   return (
-    <div class="mx-auto max-w-4xl px-4 py-6">
+    <div class="max-w-4xl">
       {filteredAndSortedItems().length === 0 ? (
         <div class="flex flex-col items-center justify-center py-16 text-center text-gray-500">
           <Package size={64} class="mb-4 text-gray-300" />
@@ -42,7 +42,7 @@ const ItemList: Component = () => {
           </p>
         </div>
       ) : (
-        <div class="flex flex-col gap-3">
+        <div class="flex flex-col border-t border-gray-200 bg-white">
           <For each={filteredAndSortedItems()}>{(item) => <ItemCard item={item} />}</For>
         </div>
       )}
