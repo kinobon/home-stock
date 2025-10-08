@@ -91,7 +91,7 @@ const Header: Component = () => {
                 ) : (
                   <>
                     <Edit3 size={16} />
-                    並び替え
+                    編集
                   </>
                 )}
               </button>

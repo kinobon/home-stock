@@ -1,7 +1,13 @@
 import type { Component } from "solid-js";
-import { setSelectedItem, setView, incrementQuantity, decrementQuantity } from "../state/store";
+import {
+  setSelectedItem,
+  setView,
+  incrementQuantity,
+  decrementQuantity,
+  removeItem,
+} from "../state/store";
 import type { Item } from "../types";
-import { GripVertical, Minus, Plus } from "lucide-solid";
+import { GripVertical, Minus, Plus, Trash2 } from "lucide-solid";
 
 interface ItemCardProps {
   item: Item;
@@ -33,6 +39,13 @@ const ItemCard: Component<ItemCardProps> = (props) => {
   const handleDecrement = (e: MouseEvent) => {
     e.stopPropagation();
     decrementQuantity(props.item.id);
+  };
+
+  const handleDelete = (e: MouseEvent) => {
+    e.stopPropagation();
+    if (confirm(`「${props.item.name}」を削除しますか？`)) {
+      removeItem(props.item.id);
+    }
   };
 
   return (
@@ -102,14 +115,25 @@ const ItemCard: Component<ItemCardProps> = (props) => {
 
       {/* ドラッグハンドル（編集モード時のみ表示・右側） */}
       {props.isDraggable && (
-        <div
-          class="flex h-full cursor-grab touch-none items-center px-3 text-gray-400 active:cursor-grabbing"
-          onTouchStart={props.onHandleTouchStart}
-          onTouchMove={props.onHandleTouchMove}
-          onTouchEnd={props.onHandleTouchEnd}
-        >
-          <GripVertical size={20} />
-        </div>
+        <>
+          {/* 削除ボタン */}
+          <button
+            onClick={handleDelete}
+            class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-600 transition-colors hover:bg-red-200 active:bg-red-300"
+          >
+            <Trash2 size={18} />
+          </button>
+
+          {/* ドラッグハンドル */}
+          <div
+            class="flex h-full cursor-grab touch-none items-center px-3 text-gray-400 active:cursor-grabbing"
+            onTouchStart={props.onHandleTouchStart}
+            onTouchMove={props.onHandleTouchMove}
+            onTouchEnd={props.onHandleTouchEnd}
+          >
+            <GripVertical size={20} />
+          </div>
+        </>
       )}
     </div>
   );
