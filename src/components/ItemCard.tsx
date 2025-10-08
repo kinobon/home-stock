@@ -13,9 +13,9 @@ interface ItemCardProps {
   onDragOver: (e: DragEvent) => void;
   onDragEnd: () => void;
   onDragLeave: () => void;
-  onTouchStart: (e: TouchEvent) => void;
-  onTouchMove: (e: TouchEvent) => void;
-  onTouchEnd: () => void;
+  onHandleTouchStart: (e: TouchEvent) => void;
+  onHandleTouchMove: (e: TouchEvent) => void;
+  onHandleTouchEnd: () => void;
 }
 
 const ItemCard: Component<ItemCardProps> = (props) => {
@@ -33,16 +33,18 @@ const ItemCard: Component<ItemCardProps> = (props) => {
       onDragOver={props.onDragOver}
       onDragEnd={props.onDragEnd}
       onDragLeave={props.onDragLeave}
-      onTouchStart={props.onTouchStart}
-      onTouchMove={props.onTouchMove}
-      onTouchEnd={props.onTouchEnd}
       class={`flex w-full items-center gap-3 border-b border-gray-200 bg-white transition-all ${
         props.isDragging ? "scale-105 opacity-60 shadow-lg" : ""
       }`}
     >
       {/* ドラッグハンドル（編集モード時のみ表示） */}
       {props.isDraggable && (
-        <div class="flex h-full items-center px-2 text-gray-400">
+        <div
+          class="flex h-full cursor-grab touch-none items-center px-2 text-gray-400 active:cursor-grabbing"
+          onTouchStart={props.onHandleTouchStart}
+          onTouchMove={props.onHandleTouchMove}
+          onTouchEnd={props.onHandleTouchEnd}
+        >
           <GripVertical size={20} />
         </div>
       )}

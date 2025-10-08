@@ -90,13 +90,14 @@ const ItemList: Component = () => {
     setDragOverIndex(null);
   };
 
-  // タッチイベントハンドラー
-  const handleTouchStart = (index: number, _e: TouchEvent) => {
+  // タッチイベントハンドラー（つまみアイコン用）
+  const handleHandleTouchStart = (index: number, e: TouchEvent) => {
     if (!state.isEditMode) return;
+    e.stopPropagation(); // イベント伝播を停止
     setDraggedIndex(index);
   };
 
-  const handleTouchMove = (e: TouchEvent) => {
+  const handleHandleTouchMove = (e: TouchEvent) => {
     if (!state.isEditMode || draggedIndex() === null) return;
     e.preventDefault(); // スクロール防止
 
@@ -117,7 +118,7 @@ const ItemList: Component = () => {
     }
   };
 
-  const handleTouchEnd = () => {
+  const handleHandleTouchEnd = () => {
     if (!state.isEditMode) return;
     handleDragEnd();
   };
@@ -147,9 +148,9 @@ const ItemList: Component = () => {
                 onDragOver={(e) => handleDragOver(e, index())}
                 onDragEnd={handleDragEnd}
                 onDragLeave={handleDragLeave}
-                onTouchStart={(e) => handleTouchStart(index(), e)}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
+                onHandleTouchStart={(e) => handleHandleTouchStart(index(), e)}
+                onHandleTouchMove={handleHandleTouchMove}
+                onHandleTouchEnd={handleHandleTouchEnd}
               />
             )}
           </For>
