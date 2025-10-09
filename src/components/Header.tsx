@@ -1,6 +1,6 @@
 import type { Component } from "solid-js";
 import { state, setSearchQuery, setSortBy, toggleSortOrder, setEditMode } from "../state/store";
-import { Home, Search, ArrowUpDown, Edit3, Check } from "lucide-solid";
+import { Home, Search, ArrowUpDown, Edit3, Check, X } from "lucide-solid";
 
 const Header: Component = () => {
   return (
@@ -20,8 +20,17 @@ const Header: Component = () => {
               placeholder="検索..."
               value={state.searchQuery}
               onInput={(e) => setSearchQuery(e.currentTarget.value)}
-              class="w-full rounded-lg border border-gray-300 bg-gray-50 py-2 pr-3 pl-10 text-sm transition-all focus:border-blue-500 focus:bg-white focus:shadow-md focus:outline-none"
+              class="w-full rounded-lg border border-gray-300 bg-gray-50 py-2 pr-10 pl-10 text-sm transition-all focus:border-blue-500 focus:bg-white focus:shadow-md focus:outline-none"
             />
+            {state.searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                aria-label="検索をクリア"
+              >
+                <X size={18} />
+              </button>
+            )}
           </div>
 
           {/* コンパクトなツールバー */}
