@@ -8,7 +8,7 @@ const Header: Component = () => {
 
   return (
     <Show when={header().visible}>
-      <header class="bg-white shadow-md">
+      <header class="z-10 border-b border-gray-200 bg-white">
         <div class="mx-auto max-w-4xl px-4 py-3">
           <h1 class="flex items-center gap-2 text-xl font-bold text-gray-800">
             <Home size={24} />

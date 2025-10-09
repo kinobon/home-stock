@@ -7,7 +7,7 @@ const BottomNav: Component = () => {
 
   return (
     <Show when={nav().visible}>
-      <nav class="border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom)]">
+      <nav class="z-10 border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom)]">
         <div class="flex h-16">
           <For each={nav().tabs}>
             {(tab) => {

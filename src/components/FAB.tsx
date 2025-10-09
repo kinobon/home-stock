@@ -9,7 +9,7 @@ const FAB: Component = () => {
     <Show when={fab().visible}>
       <button
         onClick={fab().onClick}
-        class="fixed right-6 z-50 flex size-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition-all hover:bg-blue-700 hover:shadow-xl active:scale-95"
+        class="fixed right-6 z-10 flex size-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition-all hover:bg-blue-700 hover:shadow-xl active:scale-95"
         style={{
           bottom: "calc(4rem + env(safe-area-inset-bottom) + 1rem)",
         }}
