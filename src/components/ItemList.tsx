@@ -1,4 +1,13 @@
-import { For, createMemo, createSignal, onMount, onCleanup, Show, type Component } from "solid-js";
+import {
+  For,
+  createMemo,
+  createSignal,
+  onMount,
+  onCleanup,
+  Show,
+  type Component,
+  batch,
+} from "solid-js";
 import { Portal } from "solid-js/web";
 import {
   state,
@@ -127,38 +136,40 @@ const ItemList: Component = () => {
       </div>
     );
 
-    // UIステートの設定
-    setHeader({
-      title: "備品管理",
-      visible: true,
-      customContent: searchAndSort,
-    });
+    batch(() => {
+      // UIステートの設定
+      setHeader({
+        title: "備品管理",
+        visible: true,
+        customContent: searchAndSort,
+      });
 
-    setBottomNav({
-      visible: true,
-      currentTabKey: "items", // 現在のタブを設定
-      tabs: [
-        {
-          key: "items",
-          label: "備品一覧",
-          icon: <Package size={24} />,
-          onClick: () => {
-            // タブは既に選択済みなので何もしない
+      setBottomNav({
+        visible: true,
+        currentTabKey: "items", // 現在のタブを設定
+        tabs: [
+          {
+            key: "items",
+            label: "備品一覧",
+            icon: <Package size={24} />,
+            onClick: () => {
+              // タブは既に選択済みなので何もしない
+            },
           },
-        },
-        {
-          key: "settings",
-          label: "設定",
-          icon: <SettingsIcon size={24} />,
-          onClick: () => setCurrentTab("settings"),
-        },
-      ],
-    });
+          {
+            key: "settings",
+            label: "設定",
+            icon: <SettingsIcon size={24} />,
+            onClick: () => setCurrentTab("settings"),
+          },
+        ],
+      });
 
-    setFab({
-      visible: true,
-      icon: <Plus size={28} strokeWidth={2.5} />,
-      onClick: () => setView("editor"),
+      setFab({
+        visible: true,
+        icon: <Plus size={28} strokeWidth={2.5} />,
+        onClick: () => setView("editor"),
+      });
     });
   });
   const [draggedIndex, setDraggedIndex] = createSignal<number | null>(null);

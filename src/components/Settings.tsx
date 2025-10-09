@@ -1,4 +1,4 @@
-import { onMount, type Component } from "solid-js";
+import { batch, onMount, type Component } from "solid-js";
 import { Download, Upload, Trash2, Settings as SettingsIcon, Package } from "lucide-solid";
 import { exportData, importData, clearAll, setCurrentTab } from "../state/store";
 import { useUIState } from "../context/UIStateContext";
@@ -7,34 +7,37 @@ const Settings: Component = () => {
   const [, { setHeader, setBottomNav, setFab }] = useUIState();
 
   onMount(() => {
-    // UIステートの設定
-    setHeader({
-      visible: false,
-    });
+    batch(() => {
+      // UIステートの設定
+      setHeader({
+        title: "設定",
+        visible: true,
+      });
 
-    setBottomNav({
-      visible: true,
-      currentTabKey: "settings", // 現在のタブを設定
-      tabs: [
-        {
-          key: "items",
-          label: "備品一覧",
-          icon: <Package size={24} />,
-          onClick: () => setCurrentTab("items"),
-        },
-        {
-          key: "settings",
-          label: "設定",
-          icon: <SettingsIcon size={24} />,
-          onClick: () => {
-            // 設定タブは既に選択済みなので何もしない
+      setBottomNav({
+        visible: true,
+        currentTabKey: "settings", // 現在のタブを設定
+        tabs: [
+          {
+            key: "items",
+            label: "備品一覧",
+            icon: <Package size={24} />,
+            onClick: () => setCurrentTab("items"),
           },
-        },
-      ],
-    });
+          {
+            key: "settings",
+            label: "設定",
+            icon: <SettingsIcon size={24} />,
+            onClick: () => {
+              // 設定タブは既に選択済みなので何もしない
+            },
+          },
+        ],
+      });
 
-    setFab({
-      visible: false,
+      setFab({
+        visible: false,
+      });
     });
   });
   const handleExport = () => {
@@ -103,8 +106,6 @@ const Settings: Component = () => {
 
   return (
     <div class="mx-auto max-w-4xl px-4 py-6">
-      <h1 class="mb-6 text-2xl font-bold text-gray-900">設定</h1>
-
       <div class="space-y-4">
         {/* データバックアップ */}
         <section class="rounded-lg border border-gray-200 bg-white">
