@@ -9,7 +9,7 @@ import {
 } from "../state/store";
 import { compressImage } from "../utils/image";
 import { X, Save, Image as ImageIcon, Loader2, Trash2 } from "lucide-solid";
-import QuantityStepper from "./QuantityStepper";
+import QuantitySpinner from "./QuantitySpinner";
 import ImageCropper from "./ImageCropper";
 import FullScreenModal from "./FullScreenModal";
 
@@ -185,7 +185,7 @@ const EditorModal: Component = () => {
             <div>
               <label class="mb-2 block text-sm font-medium text-gray-700">数量</label>
               <div class="flex justify-center">
-                <QuantityStepper value={quantity()} onChange={setQuantity} min={0} />
+                <QuantitySpinner value={quantity()} onChange={setQuantity} min={0} />
               </div>
             </div>
 
