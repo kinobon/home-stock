@@ -58,10 +58,7 @@ const App: Component = () => {
         <Header />
 
         {/* タブコンテンツ（スクロール可能エリア） */}
-        <div
-          ref={applyTransition}
-          class="flex-1 overflow-y-auto overscroll-contain transition-opacity duration-300"
-        >
+        <div ref={applyTransition} class="flex-1 overflow-y-auto overscroll-contain">
           <Show when={state.currentTab === "items"}>
             <ItemList />
           </Show>
