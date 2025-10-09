@@ -56,23 +56,23 @@ const ItemCard: Component<ItemCardProps> = (props) => {
       onDragOver={props.onDragOver}
       onDragEnd={props.onDragEnd}
       onDragLeave={props.onDragLeave}
-      class={"flex w-full items-center gap-3 border-b border-gray-200 bg-white py-3 transition-all"}
+      class={"flex w-full items-center gap-3 border-b border-gray-200 bg-white transition-all"}
     >
       {/* サムネイル画像 */}
       <button
         onClick={handleClick}
         disabled={props.isDraggable}
-        class={`flex-shrink-0 pl-3 transition-opacity ${
+        class={`flex-shrink-0 p-3 transition-opacity ${
           props.isDraggable ? "" : "hover:opacity-80 active:opacity-60"
         }`}
       >
         {props.item.photo ? (
-          <div class="relative size-12 overflow-hidden rounded-lg bg-gray-100">
+          <div class="relative size-10 overflow-hidden rounded-lg bg-gray-100">
             <img src={props.item.photo} alt={props.item.name} class="h-full w-full object-cover" />
           </div>
         ) : (
-          <div class="flex size-12 items-center justify-center rounded-lg bg-gray-100">
-            <span class="text-3xl">📦</span>
+          <div class="flex size-10 items-center justify-center rounded-lg bg-gray-100">
+            <span class="text-2xl">📦</span>
           </div>
         )}
       </button>
