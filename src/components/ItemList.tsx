@@ -1,10 +1,46 @@
 import { For, createMemo, createSignal, onMount, onCleanup, Show, type Component } from "solid-js";
 import { Portal } from "solid-js/web";
-import { state, reorderItems } from "../state/store";
+import { state, reorderItems, setView, setCurrentTab } from "../state/store";
 import ItemCard from "./ItemCard";
-import { Package, Plus } from "lucide-solid";
+import { Package, Plus, Settings as SettingsIcon } from "lucide-solid";
+import { useUIState } from "../context/UIStateContext";
 
 const ItemList: Component = () => {
+  const [, { setHeader, setBottomNav, setFab }] = useUIState();
+
+  onMount(() => {
+    // UIステートの設定
+    setHeader({
+      title: "備品管理",
+      visible: true,
+    });
+
+    setBottomNav({
+      visible: true,
+      tabs: [
+        {
+          key: "items",
+          label: "備品一覧",
+          icon: <Package size={24} />,
+          onClick: () => {
+            // タブは既に選択済みなので何もしない
+          },
+        },
+        {
+          key: "settings",
+          label: "設定",
+          icon: <SettingsIcon size={24} />,
+          onClick: () => setCurrentTab("settings"),
+        },
+      ],
+    });
+
+    setFab({
+      visible: true,
+      icon: <Plus size={28} strokeWidth={2.5} />,
+      onClick: () => setView("editor"),
+    });
+  });
   const [draggedIndex, setDraggedIndex] = createSignal<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = createSignal<number | null>(null);
   const [dragPosition, setDragPosition] = createSignal<{ x: number; y: number } | null>(null);

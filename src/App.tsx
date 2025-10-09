@@ -9,6 +9,7 @@ import Settings from "./components/Settings";
 import FAB from "./components/FAB";
 import { useIOSScrollDebounce, optimizeTouchEvents } from "./utils/scroll";
 import { tabTransition } from "./utils/transition";
+import { UIStateProvider } from "./context/UIStateContext";
 
 const App: Component = () => {
   const [prevTabIndex, setPrevTabIndex] = createSignal(0);
@@ -51,33 +52,31 @@ const App: Component = () => {
   });
 
   return (
-    <div class="flex h-dvh flex-col overflow-hidden bg-gray-50">
-      {/* ヘッダーは備品一覧タブのみ表示 */}
-      <Show when={state.currentTab === "items"}>
+    <UIStateProvider>
+      <div class="flex h-dvh flex-col overflow-hidden bg-gray-50">
+        {/* ヘッダー */}
         <Header />
-      </Show>
 
-      {/* タブコンテンツ（スクロール可能エリア） */}
-      <div ref={applyTransition} class="flex-1 overflow-y-auto overscroll-contain">
-        <Show when={state.currentTab === "items"}>
-          <ItemList />
-        </Show>
-        <Show when={state.currentTab === "settings"}>
-          <Settings />
-        </Show>
-      </div>
+        {/* タブコンテンツ（スクロール可能エリア） */}
+        <div ref={applyTransition} class="flex-1 overflow-y-auto overscroll-contain">
+          <Show when={state.currentTab === "items"}>
+            <ItemList />
+          </Show>
+          <Show when={state.currentTab === "settings"}>
+            <Settings />
+          </Show>
+        </div>
 
-      {/* FAB（備品一覧タブのみ表示） */}
-      <Show when={state.currentTab === "items"}>
+        {/* FAB */}
         <FAB />
-      </Show>
 
-      {/* モーダル */}
-      <EditorModal />
+        {/* モーダル */}
+        <EditorModal />
 
-      {/* ボトムナビゲーション */}
-      <BottomNav />
-    </div>
+        {/* ボトムナビゲーション */}
+        <BottomNav />
+      </div>
+    </UIStateProvider>
   );
 };
 

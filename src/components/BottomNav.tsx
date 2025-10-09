@@ -1,32 +1,28 @@
-import { type Component } from "solid-js";
-import { state, setCurrentTab } from "../state/store";
-import { Package, Settings } from "lucide-solid";
+import { Show, type Component, For } from "solid-js";
+import { useUIState } from "../context/UIStateContext";
 
 const BottomNav: Component = () => {
-  return (
-    <nav class="border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom)]">
-      <div class="flex h-16">
-        <button
-          onClick={() => setCurrentTab("items")}
-          class={`flex flex-1 flex-col items-center justify-center gap-1 transition-colors ${
-            state.currentTab === "items" ? "text-blue-600" : "text-gray-500 active:bg-gray-100"
-          }`}
-        >
-          <Package size={24} />
-          <span class="text-xs font-medium">備品一覧</span>
-        </button>
+  const [uiState] = useUIState();
+  const nav = () => uiState.bottomNav;
 
-        <button
-          onClick={() => setCurrentTab("settings")}
-          class={`flex flex-1 flex-col items-center justify-center gap-1 transition-colors ${
-            state.currentTab === "settings" ? "text-blue-600" : "text-gray-500 active:bg-gray-100"
-          }`}
-        >
-          <Settings size={24} />
-          <span class="text-xs font-medium">設定</span>
-        </button>
-      </div>
-    </nav>
+  return (
+    <Show when={nav().visible}>
+      <nav class="border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom)]">
+        <div class="flex h-16">
+          <For each={nav().tabs}>
+            {(tab) => (
+              <button
+                onClick={tab.onClick}
+                class="flex flex-1 flex-col items-center justify-center gap-1 text-gray-500 transition-colors active:bg-gray-100"
+              >
+                {tab.icon}
+                <span class="text-xs font-medium">{tab.label}</span>
+              </button>
+            )}
+          </For>
+        </div>
+      </nav>
+    </Show>
   );
 };
 

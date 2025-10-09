@@ -1,8 +1,42 @@
-import { type Component } from "solid-js";
-import { Download, Upload, Trash2 } from "lucide-solid";
-import { exportData, importData, clearAll } from "../state/store";
+import { onMount, type Component } from "solid-js";
+import { Download, Upload, Trash2, Settings as SettingsIcon, Package } from "lucide-solid";
+import { exportData, importData, clearAll, setCurrentTab } from "../state/store";
+import { useUIState } from "../context/UIStateContext";
 
 const Settings: Component = () => {
+  const [, { setHeader, setBottomNav, setFab }] = useUIState();
+
+  onMount(() => {
+    // UIステートの設定
+    setHeader({
+      title: "設定",
+      visible: true,
+    });
+
+    setBottomNav({
+      visible: true,
+      tabs: [
+        {
+          key: "items",
+          label: "備品一覧",
+          icon: <Package size={24} />,
+          onClick: () => setCurrentTab("items"),
+        },
+        {
+          key: "settings",
+          label: "設定",
+          icon: <SettingsIcon size={24} />,
+          onClick: () => {
+            // 設定タブは既に選択済みなので何もしない
+          },
+        },
+      ],
+    });
+
+    setFab({
+      visible: false,
+    });
+  });
   const handleExport = () => {
     try {
       console.log("[Export] Starting export...");
