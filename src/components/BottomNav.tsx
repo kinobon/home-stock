@@ -15,7 +15,7 @@ const BottomNav: Component = () => {
               return (
                 <button
                   onClick={tab.onClick}
-                  class={`flex flex-1 flex-col items-center justify-center gap-1 transition-colors duration-200 ${
+                  class={`flex flex-1 flex-col items-center justify-center gap-1 transition-colors ${
                     isActive() ? "text-blue-600" : "text-gray-500 active:bg-gray-100"
                   }`}
                 >

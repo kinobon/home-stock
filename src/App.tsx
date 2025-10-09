@@ -9,11 +9,17 @@ import Settings from "./components/Settings";
 import FAB from "./components/FAB";
 import { useIOSScrollDebounce, optimizeTouchEvents } from "./utils/scroll";
 import { tabTransition } from "./utils/transition";
+import { useFadeSwitch } from "./utils/animation";
 import { UIStateProvider } from "./context/UIStateContext";
 
 const App: Component = () => {
   const [prevTabIndex, setPrevTabIndex] = createSignal(0);
   const [currentTabIndex, setCurrentTabIndex] = createSignal(0);
+
+  let contentRef: HTMLDivElement | undefined;
+
+  // タブ切り替え時のフェードアニメーション
+  useFadeSwitch(contentRef, () => state.currentTab, 300);
 
   // タブ名からインデックスへのマッピング
   const getTabIndex = (tab: string) => {
@@ -59,8 +65,11 @@ const App: Component = () => {
 
         {/* タブコンテンツ（スクロール可能エリア） */}
         <div
-          ref={applyTransition}
-          class="flex-1 overflow-y-auto overscroll-contain transition-opacity duration-300"
+          ref={(el) => {
+            contentRef = el;
+            applyTransition(el);
+          }}
+          class="flex-1 overflow-y-auto overscroll-contain"
         >
           <Show when={state.currentTab === "items"}>
             <ItemList />
