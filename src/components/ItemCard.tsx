@@ -93,7 +93,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
         <div class="flex items-center gap-2 pr-3">
           <button
             onClick={handleDecrement}
-            class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 active:bg-gray-300"
+            class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 active:bg-gray-300"
             disabled={props.item.quantity === 0}
           >
             <Minus size={16} />
@@ -106,7 +106,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
           </div>
           <button
             onClick={handleIncrement}
-            class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 active:bg-gray-300"
+            class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 active:bg-gray-300"
           >
             <Plus size={16} />
           </button>
