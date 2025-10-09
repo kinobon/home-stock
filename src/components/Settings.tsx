@@ -11,7 +11,6 @@ const Settings: Component = () => {
     setHeader({
       title: "設定",
       visible: true,
-      // customContentを指定しないので自動的にundefinedになる
     });
 
     setBottomNav({
