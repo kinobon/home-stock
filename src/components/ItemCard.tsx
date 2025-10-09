@@ -102,7 +102,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
             <span class="w-8 text-center text-sm font-medium text-gray-900">
               {props.item.quantity}
             </span>
-            <span class="text-[0.62rem] text-gray-600">所持数</span>
+            <span class="text-[0.62rem] text-gray-600">数量</span>
           </div>
           <button
             onClick={handleIncrement}
