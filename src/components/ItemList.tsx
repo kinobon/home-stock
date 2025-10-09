@@ -49,11 +49,6 @@ const ItemList: Component = () => {
             setSearchQuery(e.currentTarget.value);
             if (state.isEditMode) {
               setEditMode(false);
-              setFab({
-                visible: true,
-                icon: <Plus size={28} strokeWidth={2.5} />,
-                onClick: () => setView("editor"),
-              });
             }
           }}
           class="w-full rounded-lg border border-gray-300 bg-gray-50 py-2 pr-10 pl-10 text-sm transition-all focus:border-blue-500 focus:bg-white focus:shadow-md focus:outline-none"
@@ -78,11 +73,6 @@ const ItemList: Component = () => {
               setSortBy("name");
               if (state.isEditMode) {
                 setEditMode(false);
-                setFab({
-                  visible: true,
-                  icon: <Plus size={28} strokeWidth={2.5} />,
-                  onClick: () => setView("editor"),
-                });
               }
             }}
             class={`px-3 py-2 text-xs font-medium transition-colors sm:text-sm ${
@@ -96,11 +86,6 @@ const ItemList: Component = () => {
               setSortBy("quantity");
               if (state.isEditMode) {
                 setEditMode(false);
-                setFab({
-                  visible: true,
-                  icon: <Plus size={28} strokeWidth={2.5} />,
-                  onClick: () => setView("editor"),
-                });
               }
             }}
             class={`px-3 py-2 text-xs font-medium transition-colors sm:text-sm ${
@@ -140,13 +125,7 @@ const ItemList: Component = () => {
         {state.sortBy === "custom" && (
           <button
             onClick={() => {
-              const newEditMode = !state.isEditMode;
-              setEditMode(newEditMode);
-              setFab({
-                visible: !newEditMode,
-                icon: <Plus size={28} strokeWidth={2.5} />,
-                onClick: () => setView("editor"),
-              });
+              setEditMode(!state.isEditMode);
             }}
             disabled={state.searchQuery.trim() !== ""}
             class={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium shadow-sm transition-all ${
@@ -205,9 +184,14 @@ const ItemList: Component = () => {
       });
 
       setFab({
-        visible: !state.isEditMode,
+        visible: true,
         icon: <Plus size={28} strokeWidth={2.5} />,
-        onClick: () => setView("editor"),
+        onClick: () => {
+          if (state.isEditMode) {
+            setEditMode(false);
+          }
+          setView("editor");
+        },
       });
     });
   });
