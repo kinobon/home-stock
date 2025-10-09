@@ -132,7 +132,7 @@ const ItemList: Component = () => {
               ? "cursor-not-allowed bg-gray-400 text-gray-200"
               : state.isEditMode
                 ? "bg-green-600 text-white hover:bg-green-700"
-                : "bg-gray-600 text-white hover:bg-gray-700"
+                : "bg-green-600 text-white hover:bg-green-700"
           }`}
         >
           {state.isEditMode ? (
