@@ -9,8 +9,7 @@ const Settings: Component = () => {
   onMount(() => {
     // UIステートの設定
     setHeader({
-      title: "設定",
-      visible: true,
+      visible: false,
     });
 
     setBottomNav({
