@@ -10,10 +10,14 @@ const ItemList: Component = () => {
   const [dragPosition, setDragPosition] = createSignal<{ x: number; y: number } | null>(null);
   const [containerWidth, setContainerWidth] = createSignal<number>(0);
   const [containerLeft, setContainerLeft] = createSignal<number>(0);
+  const [longPressActive, setLongPressActive] = createSignal<boolean>(false);
   let containerRef: HTMLDivElement | undefined;
   let itemListRef: HTMLDivElement | undefined;
   let scrollContainerRef: HTMLElement | null = null;
   let autoScrollInterval: number | undefined;
+  let longPressTimer: number | undefined;
+  let longPressStartPos: { x: number; y: number } | null = null;
+  let hasScrolledDuringTouch = false;
 
   onMount(() => {
     // 親のスクロールコンテナを探す
@@ -30,6 +34,20 @@ const ItemList: Component = () => {
         const overflowY = window.getComputedStyle(parent).overflowY;
         if (overflowY === "auto" || overflowY === "scroll") {
           scrollContainerRef = parent;
+          
+          // スクロールイベントリスナーを追加してスクロール検出
+          const handleScroll = () => {
+            if (longPressTimer) {
+              hasScrolledDuringTouch = true;
+            }
+          };
+          scrollContainerRef.addEventListener("scroll", handleScroll);
+          
+          // クリーンアップ時にリスナーを削除
+          onCleanup(() => {
+            scrollContainerRef?.removeEventListener("scroll", handleScroll);
+          });
+          
           break;
         }
         parent = parent.parentElement;
@@ -42,6 +60,11 @@ const ItemList: Component = () => {
     if (autoScrollInterval) {
       clearInterval(autoScrollInterval);
       autoScrollInterval = undefined;
+    }
+    // ロングプレスタイマーもクリア
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = undefined;
     }
   });
 
@@ -132,27 +155,67 @@ const ItemList: Component = () => {
   const handleHandleTouchStart = (index: number, e: TouchEvent) => {
     if (!state.isEditMode) return;
     e.stopPropagation(); // イベント伝播を停止
-    setDraggedIndex(index);
-
-    // ドラッグ開始時にコンテナの幅と位置を取得
-    if (itemListRef) {
-      const rect = itemListRef.getBoundingClientRect();
-      setContainerWidth(rect.width);
-      setContainerLeft(rect.left);
-    }
-
+    
     const touch = e.touches[0];
-    if (touch) {
-      setDragPosition({ x: touch.clientX, y: touch.clientY });
-    }
+    if (!touch) return;
+    
+    // ロングプレス開始位置を記録
+    longPressStartPos = { x: touch.clientX, y: touch.clientY };
+    hasScrolledDuringTouch = false;
+    
+    // ロングプレスタイマーを開始（500ms）
+    longPressTimer = window.setTimeout(() => {
+      // スクロールしていた場合はドラッグを開始しない
+      if (hasScrolledDuringTouch) {
+        longPressTimer = undefined;
+        return;
+      }
+      
+      // ロングプレス成功 - ドラッグを開始
+      setLongPressActive(true);
+      setDraggedIndex(index);
+
+      // ドラッグ開始時にコンテナの幅と位置を取得
+      if (itemListRef) {
+        const rect = itemListRef.getBoundingClientRect();
+        setContainerWidth(rect.width);
+        setContainerLeft(rect.left);
+      }
+
+      if (touch) {
+        setDragPosition({ x: touch.clientX, y: touch.clientY });
+      }
+      
+      // 振動フィードバック（対応ブラウザのみ）
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+      
+      longPressTimer = undefined;
+    }, 500);
   };
 
   const handleHandleTouchMove = (e: TouchEvent) => {
-    if (!state.isEditMode || draggedIndex() === null) return;
-    e.preventDefault(); // スクロール防止
-
     const touch = e.touches[0];
     if (!touch) return;
+    
+    // ロングプレスタイマーが動作中の場合
+    if (longPressTimer && longPressStartPos) {
+      // タッチ位置が大きく移動した場合はロングプレスをキャンセル
+      const dx = Math.abs(touch.clientX - longPressStartPos.x);
+      const dy = Math.abs(touch.clientY - longPressStartPos.y);
+      if (dx > 10 || dy > 10) {
+        clearTimeout(longPressTimer);
+        longPressTimer = undefined;
+        longPressStartPos = null;
+      }
+      // ロングプレス判定中はスクロールを許可
+      return;
+    }
+    
+    // ロングプレスが成功してドラッグ中の場合のみ、以下の処理を実行
+    if (!state.isEditMode || draggedIndex() === null || !longPressActive()) return;
+    e.preventDefault(); // スクロール防止
 
     // ドラッグ位置を更新
     setDragPosition({ x: touch.clientX, y: touch.clientY });
@@ -210,6 +273,15 @@ const ItemList: Component = () => {
   };
 
   const handleHandleTouchEnd = () => {
+    // ロングプレスタイマーをクリア
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      longPressTimer = undefined;
+    }
+    
+    longPressStartPos = null;
+    hasScrolledDuringTouch = false;
+    
     if (!state.isEditMode) return;
 
     // 自動スクロール停止
@@ -220,6 +292,7 @@ const ItemList: Component = () => {
 
     // ドラッグ位置をクリア
     setDragPosition(null);
+    setLongPressActive(false);
 
     handleDragEnd();
   };
