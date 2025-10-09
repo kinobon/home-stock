@@ -1,9 +1,15 @@
+# GitHub Pages deployment workflow
+# This workflow builds and deploys the app to GitHub Pages
+# Works for both public and private repositories (requires GitHub Pro/Team for private repos)
+# Can be triggered manually via workflow_dispatch or automatically on push to main
+
 name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch: # Allow manual deployment
 
 permissions:
   contents: read
