@@ -57,6 +57,16 @@ export interface ExportData {
 
 `.github/workflows/deploy.yml`
 
+このワークフローは**パブリックリポジトリとプライベートリポジトリの両方**で動作します。
+
+**プライベートリポジトリの要件:**
+- GitHub Pro、GitHub Team、GitHub Enterprise Cloud、または GitHub Enterprise Server のいずれかが必要
+- GitHub Free では、GitHub Pages はパブリックリポジトリでのみ利用可能
+
+**機能:**
+- `main` ブランチへのプッシュで自動デプロイ
+- 手動デプロイ (`workflow_dispatch`) にも対応
+
 ```yaml
 name: Deploy to GitHub Pages
 
@@ -64,6 +74,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: # 手動デプロイを許可
 
 permissions:
   contents: read
@@ -82,13 +93,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

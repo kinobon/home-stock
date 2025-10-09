@@ -184,6 +184,18 @@ GitHub Actions で自動デプロイされます:
 1. GitHub リポジトリの Settings → Pages
 2. Source を "GitHub Actions" に設定
 
+### プライベートリポジトリでの使用
+
+このワークフローは**パブリックリポジトリとプライベートリポジトリの両方**で動作します。
+
+**プライベートリポジトリの要件:**
+- GitHub Pro、GitHub Team、GitHub Enterprise Cloud、または GitHub Enterprise Server のいずれかが必要です
+- GitHub Free では、GitHub Pages はパブリックリポジトリでのみ利用可能です
+
+**手動デプロイ:**
+- GitHub の Actions タブから "Deploy to GitHub Pages" ワークフローを選択
+- "Run workflow" ボタンで手動デプロイが可能です
+
 ---
 
 ## 📄 License
