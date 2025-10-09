@@ -14,6 +14,7 @@ export interface AppUIState {
       icon?: JSX.Element;
       onClick?: () => void;
     }>;
+    currentTabKey?: string; // 現在選択中のタブ
     visible: boolean;
   };
   fab: {

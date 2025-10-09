@@ -1,6 +1,5 @@
 import { Show, type Component, For } from "solid-js";
 import { useUIState } from "../context/UIStateContext";
-import { state } from "../state/store";
 
 const BottomNav: Component = () => {
   const [uiState] = useUIState();
@@ -12,7 +11,7 @@ const BottomNav: Component = () => {
         <div class="flex h-16">
           <For each={nav().tabs}>
             {(tab) => {
-              const isActive = () => state.currentTab === tab.key;
+              const isActive = () => nav().currentTabKey === tab.key;
               return (
                 <button
                   onClick={tab.onClick}

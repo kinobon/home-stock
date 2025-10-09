@@ -50,6 +50,7 @@ export function UIStateProvider(props: { children: JSX.Element }) {
       } else {
         return {
           tabs: data.tabs ?? prev.tabs,
+          currentTabKey: data.currentTabKey,
           visible: data.visible ?? prev.visible,
         };
       }

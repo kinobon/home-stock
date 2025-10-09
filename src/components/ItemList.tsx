@@ -136,6 +136,7 @@ const ItemList: Component = () => {
 
     setBottomNav({
       visible: true,
+      currentTabKey: "items", // 現在のタブを設定
       tabs: [
         {
           key: "items",
