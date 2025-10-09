@@ -121,34 +121,32 @@ const ItemList: Component = () => {
         </div>
 
         {/* 右側ボタングループ */}
-        {/* 編集モード切り替えボタン（カスタムソート時のみ表示） */}
-        {state.sortBy === "custom" && (
-          <button
-            onClick={() => {
-              setEditMode(!state.isEditMode);
-            }}
-            disabled={state.searchQuery.trim() !== ""}
-            class={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium shadow-sm transition-all ${
-              state.searchQuery.trim() !== ""
-                ? "cursor-not-allowed bg-gray-400 text-gray-200"
-                : state.isEditMode
-                  ? "bg-green-600 text-white hover:bg-green-700"
-                  : "bg-gray-600 text-white hover:bg-gray-700"
-            }`}
-          >
-            {state.isEditMode ? (
-              <>
-                <Check size={16} />
-                完了
-              </>
-            ) : (
-              <>
-                <Edit3 size={16} />
-                編集
-              </>
-            )}
-          </button>
-        )}
+        {/* 編集モード切り替えボタン（カスタムソート時は常に表示） */}
+        <button
+          onClick={() => {
+            setEditMode(!state.isEditMode);
+          }}
+          disabled={state.sortBy !== "custom" || state.searchQuery.trim() !== ""}
+          class={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium shadow-sm transition-all ${
+            state.sortBy !== "custom" || state.searchQuery.trim() !== ""
+              ? "cursor-not-allowed bg-gray-400 text-gray-200"
+              : state.isEditMode
+                ? "bg-green-600 text-white hover:bg-green-700"
+                : "bg-gray-600 text-white hover:bg-gray-700"
+          }`}
+        >
+          {state.isEditMode ? (
+            <>
+              <Check size={16} />
+              完了
+            </>
+          ) : (
+            <>
+              <Edit3 size={16} />
+              編集
+            </>
+          )}
+        </button>
       </div>
     </div>
   ));
