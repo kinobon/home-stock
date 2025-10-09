@@ -112,7 +112,15 @@ const ItemList: Component = () => {
           {/* 編集モード切り替えボタン（カスタムソート時のみ表示） */}
           {state.sortBy === "custom" && (
             <button
-              onClick={() => setEditMode(!state.isEditMode)}
+              onClick={() => {
+                const newEditMode = !state.isEditMode;
+                setEditMode(newEditMode);
+                setFab({
+                  visible: !newEditMode,
+                  icon: <Plus size={28} strokeWidth={2.5} />,
+                  onClick: () => setView("editor"),
+                });
+              }}
               class={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium shadow-sm transition-all ${
                 state.isEditMode
                   ? "bg-green-600 text-white hover:bg-green-700"
@@ -166,7 +174,7 @@ const ItemList: Component = () => {
       });
 
       setFab({
-        visible: true,
+        visible: !state.isEditMode,
         icon: <Plus size={28} strokeWidth={2.5} />,
         onClick: () => setView("editor"),
       });
