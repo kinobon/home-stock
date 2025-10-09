@@ -11,7 +11,7 @@ const Settings: Component = () => {
     setHeader({
       title: "設定",
       visible: true,
-      customContent: undefined, // カスタムコンテンツをクリア
+      // customContentを指定しないので自動的にundefinedになる
     });
 
     setBottomNav({
