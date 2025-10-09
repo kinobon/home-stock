@@ -25,6 +25,12 @@ export async function initializeStore() {
 // アイテム作成
 export async function createItem(name: string, quantity: number, photo?: string, memo?: string) {
   const now = Date.now();
+  
+  // 現在の最大order値を取得
+  const maxOrder = state.items.reduce((max, item) => {
+    return Math.max(max, item.order ?? 0);
+  }, -1);
+  
   const newItem: Item = {
     id: nanoid(),
     name,
@@ -33,6 +39,7 @@ export async function createItem(name: string, quantity: number, photo?: string,
     memo,
     createdAt: now,
     updatedAt: now,
+    order: maxOrder + 1, // 最後に追加
   };
 
   await saveItem(newItem);

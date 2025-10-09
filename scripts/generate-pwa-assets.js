@@ -51,8 +51,8 @@ async function generateIcons() {
     const outputPath = path.join(publicDir, name);
     await sharp(sourceIcon)
       .resize(size, size, {
-        fit: "contain",
-        background: { r: 255, g: 255, b: 255, alpha: 1 },
+        fit: "cover", // 正方形に塗り潰し
+        position: "center",
       })
       .png()
       .toFile(outputPath);

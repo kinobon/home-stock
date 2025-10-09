@@ -12,10 +12,16 @@ const Settings: Component = () => {
       const a = document.createElement("a");
       a.href = url;
       a.download = `home-stock-backup-${Date.now()}.json`;
+      a.style.display = "none";
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      
+      // ブラウザヒストリーに追加されないように、クリック後すぐにクリーンアップ
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 0);
+      
       console.log("[Export] Export completed successfully");
       setTimeout(() => {
         alert("✅ エクスポートが完了しました");

@@ -26,7 +26,6 @@ interface ItemCardProps {
 
 const ItemCard: Component<ItemCardProps> = (props) => {
   const handleClick = () => {
-    if (props.isDraggable) return; // 編集モード中はクリック無効
     setSelectedItem(props.item.id);
     setView("editor");
   };
@@ -61,10 +60,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
       {/* サムネイル画像 */}
       <button
         onClick={handleClick}
-        disabled={props.isDraggable}
-        class={`flex-shrink-0 pl-3 transition-opacity ${
-          props.isDraggable ? "" : "hover:opacity-80 active:opacity-60"
-        }`}
+        class="flex-shrink-0 pl-3 transition-opacity hover:opacity-80 active:opacity-60"
       >
         {props.item.photo ? (
           <div class="relative size-12 overflow-hidden rounded-lg bg-gray-100">
@@ -80,10 +76,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
       {/* 名前 */}
       <button
         onClick={handleClick}
-        disabled={props.isDraggable}
-        class={`flex-1 text-left transition-colors ${
-          props.isDraggable ? "" : "hover:text-blue-600 active:text-blue-700"
-        }`}
+        class="flex-1 text-left transition-colors hover:text-blue-600 active:text-blue-700"
       >
         <h3 class="text-base font-medium text-gray-900">{props.item.name}</h3>
       </button>
