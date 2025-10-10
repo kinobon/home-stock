@@ -3,8 +3,6 @@
 > **備品在庫管理アプリ** - SolidJS + TailwindCSS + PWA  
 > 家の備品（入浴剤など）の在庫をローカルで管理。完全オフライン対応。
 
-[![Deploy to GitHub Pages](https://github.com/[username]/home-stock/actions/workflows/deploy.yml/badge.svg)](https://github.com/[username]/home-stock/actions/workflows/deploy.yml)
-
 ---
 
 ## ✨ Features
