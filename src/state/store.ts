@@ -1,7 +1,7 @@
 import { createStore } from "solid-js/store";
 import { nanoid } from "nanoid";
 import type { Item, AppState, Log } from "../types";
-import { getAllItems, saveItem, deleteItem, clearAllItems } from "./db";
+import { getAllItems, saveItem, deleteItem, clearAllItems, getAllLogs, saveLogs } from "./db";
 
 const initialState: AppState = {
   items: [],
@@ -20,6 +20,7 @@ export const [state, setState] = createStore<AppState>(initialState);
 // 初期化: IndexedDB からデータをロード
 export async function initializeStore() {
   const items = await getAllItems();
+  const logs = await getAllLogs();
 
   // 既存データのマイグレーション: confirmedValueがない場合は追加
   const migratedItems = items.map((item) => {
@@ -37,6 +38,7 @@ export async function initializeStore() {
   }
 
   setState("items", migratedItems);
+  setState("logs", logs);
 }
 
 // アイテム作成
@@ -195,10 +197,10 @@ export async function confirmAllQuantities() {
     }
   }
 
-  // ログを追加
+  // ログを追加してIndexedDBに保存
   if (logs.length > 0) {
+    await saveLogs(logs);
     setState("logs", (prevLogs) => [...logs, ...prevLogs]);
-    // TODO: ログをIndexedDBに保存
   }
 }
 
