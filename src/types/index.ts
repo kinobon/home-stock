@@ -39,4 +39,5 @@ export interface ExportData {
   version: string;
   exportedAt: Timestamp;
   items: Item[];
+  logs: Log[];
 }

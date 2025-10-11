@@ -1,7 +1,15 @@
 import { createStore } from "solid-js/store";
 import { nanoid } from "nanoid";
 import type { Item, AppState, Log } from "../types";
-import { getAllItems, saveItem, deleteItem, clearAllItems, getAllLogs, saveLogs } from "./db";
+import {
+  getAllItems,
+  saveItem,
+  deleteItem,
+  clearAllItems,
+  getAllLogs,
+  saveLogs,
+  clearAllLogs,
+} from "./db";
 
 const initialState: AppState = {
   items: [],
@@ -207,9 +215,10 @@ export async function confirmAllQuantities() {
 // エクスポート/インポート
 export function exportData(): string {
   const exportData = {
-    version: "1.0.0",
+    version: "2.0.0", // ログ対応のため2.0.0に
     exportedAt: Date.now(),
     items: state.items,
+    logs: state.logs,
   };
   return JSON.stringify(exportData, null, 2);
 }
@@ -246,10 +255,27 @@ export async function importData(jsonString: string) {
 
     console.log(`[importData] Validated ${data.items.length} items`);
 
+    // データベースをクリアしてインポート
     await clearAllItems();
+    await clearAllLogs();
+
     for (const item of data.items) {
+      // confirmedValueがない場合は追加
+      if (item.confirmedValue === undefined) {
+        item.confirmedValue = item.quantity;
+      }
       await saveItem(item);
     }
+
+    // ログがある場合はインポート
+    if (data.logs && Array.isArray(data.logs)) {
+      await saveLogs(data.logs);
+      setState("logs", data.logs);
+      console.log(`[importData] Imported ${data.logs.length} logs`);
+    } else {
+      setState("logs", []);
+    }
+
     setState("items", data.items);
     console.log("[importData] Import completed successfully");
   } catch (error) {
