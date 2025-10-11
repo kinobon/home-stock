@@ -20,7 +20,23 @@ export const [state, setState] = createStore<AppState>(initialState);
 // 初期化: IndexedDB からデータをロード
 export async function initializeStore() {
   const items = await getAllItems();
-  setState("items", items);
+
+  // 既存データのマイグレーション: confirmedValueがない場合は追加
+  const migratedItems = items.map((item) => {
+    if (item.confirmedValue === undefined) {
+      return { ...item, confirmedValue: item.quantity };
+    }
+    return item;
+  });
+
+  // マイグレーションが必要な場合は保存
+  for (const item of migratedItems) {
+    if (items.find((i) => i.id === item.id)?.confirmedValue === undefined) {
+      await saveItem(item);
+    }
+  }
+
+  setState("items", migratedItems);
 }
 
 // アイテム作成

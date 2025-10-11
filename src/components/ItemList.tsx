@@ -29,6 +29,8 @@ import {
   ArrowUpDown,
   Edit3,
   Check,
+  Clock,
+  Calculator,
 } from "lucide-solid";
 import { useUIState } from "../context/UIStateContext";
 
@@ -121,32 +123,43 @@ const ItemList: Component = () => {
         </div>
 
         {/* 右側ボタングループ */}
-        {/* 編集モード切り替えボタン（カスタムソート時は常に表示） */}
-        <button
-          onClick={() => {
-            setEditMode(!state.isEditMode);
-          }}
-          disabled={state.sortBy !== "custom" || state.searchQuery.trim() !== ""}
-          class={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium shadow-sm transition-all ${
-            state.sortBy !== "custom" || state.searchQuery.trim() !== ""
-              ? "cursor-not-allowed bg-gray-400 text-gray-200"
-              : state.isEditMode
-                ? "bg-green-600 text-white hover:bg-green-700"
-                : "bg-green-600 text-white hover:bg-green-700"
-          }`}
-        >
-          {state.isEditMode ? (
-            <>
-              <Check size={16} />
-              完了
-            </>
-          ) : (
-            <>
-              <Edit3 size={16} />
-              編集
-            </>
-          )}
-        </button>
+        <div class="flex items-center gap-2">
+          {/* 数量調整ボタン */}
+          <button
+            onClick={() => setView("counter")}
+            class="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700"
+          >
+            <Calculator size={16} />
+            数量調整
+          </button>
+
+          {/* 編集モード切り替えボタン（カスタムソート時は常に表示） */}
+          <button
+            onClick={() => {
+              setEditMode(!state.isEditMode);
+            }}
+            disabled={state.sortBy !== "custom" || state.searchQuery.trim() !== ""}
+            class={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium shadow-sm transition-all ${
+              state.sortBy !== "custom" || state.searchQuery.trim() !== ""
+                ? "cursor-not-allowed bg-gray-400 text-gray-200"
+                : state.isEditMode
+                  ? "bg-green-600 text-white hover:bg-green-700"
+                  : "bg-gray-600 text-white hover:bg-gray-700"
+            }`}
+          >
+            {state.isEditMode ? (
+              <>
+                <Check size={16} />
+                完了
+              </>
+            ) : (
+              <>
+                <Edit3 size={16} />
+                編集
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   ));
@@ -171,6 +184,12 @@ const ItemList: Component = () => {
             onClick: () => {
               // タブは既に選択済みなので何もしない
             },
+          },
+          {
+            key: "history",
+            label: "履歴",
+            icon: <Clock size={24} />,
+            onClick: () => setCurrentTab("history"),
           },
           {
             key: "settings",

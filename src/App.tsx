@@ -4,6 +4,8 @@ import { state, initializeStore } from "./state/store";
 import Header from "./components/Header";
 import ItemList from "./components/ItemList";
 import EditorModal from "./components/EditorModal";
+import CounterScreen from "./components/CounterScreen";
+import HistoryScreen from "./components/HistoryScreen";
 import BottomNav from "./components/BottomNav";
 import Settings from "./components/Settings";
 import FAB from "./components/FAB";
@@ -17,7 +19,9 @@ const App: Component = () => {
 
   // タブ名からインデックスへのマッピング
   const getTabIndex = (tab: string) => {
-    return tab === "items" ? 0 : 1;
+    if (tab === "items") return 0;
+    if (tab === "history") return 1;
+    return 2; // settings
   };
 
   // タブ変更を検知してインデックスを更新
@@ -59,8 +63,14 @@ const App: Component = () => {
 
         {/* タブコンテンツ（スクロール可能エリア） */}
         <div ref={applyTransition} class="flex-1 overflow-y-auto overscroll-contain">
-          <Show when={state.currentTab === "items"}>
+          <Show when={state.currentTab === "items" && state.view === "list"}>
             <ItemList />
+          </Show>
+          <Show when={state.currentTab === "items" && state.view === "counter"}>
+            <CounterScreen />
+          </Show>
+          <Show when={state.currentTab === "history"}>
+            <HistoryScreen />
           </Show>
           <Show when={state.currentTab === "settings"}>
             <Settings />

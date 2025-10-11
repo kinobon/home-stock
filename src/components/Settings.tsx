@@ -1,5 +1,5 @@
 import { batch, onMount, type Component } from "solid-js";
-import { Download, Upload, Trash2, Settings as SettingsIcon, Package } from "lucide-solid";
+import { Download, Upload, Trash2, Settings as SettingsIcon, Package, Clock } from "lucide-solid";
 import { exportData, importData, clearAll, setCurrentTab } from "../state/store";
 import { useUIState } from "../context/UIStateContext";
 
@@ -23,6 +23,12 @@ const Settings: Component = () => {
             label: "備品一覧",
             icon: <Package size={24} />,
             onClick: () => setCurrentTab("items"),
+          },
+          {
+            key: "history",
+            label: "履歴",
+            icon: <Clock size={24} />,
+            onClick: () => setCurrentTab("history"),
           },
           {
             key: "settings",
