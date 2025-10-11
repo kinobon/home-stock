@@ -103,9 +103,11 @@ const ItemCard: Component<ItemCardProps> = (props) => {
             <Minus size={16} />
           </button>
           <div class="flex flex-col items-center">
-            <span class={`w-8 text-center text-sm font-medium ${
-              props.item.quantity === 0 ? "text-red-600" : "text-gray-900"
-            }`}>
+            <span
+              class={`w-8 text-center text-sm font-medium ${
+                props.item.quantity === 0 ? "text-red-600" : "text-gray-900"
+              }`}
+            >
               {props.item.quantity}
             </span>
             <span class="text-[0.62rem] text-gray-600">数量</span>

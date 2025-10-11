@@ -1,10 +1,11 @@
 import { createStore } from "solid-js/store";
 import { nanoid } from "nanoid";
-import type { Item, AppState } from "../types";
+import type { Item, AppState, Log } from "../types";
 import { getAllItems, saveItem, deleteItem, clearAllItems } from "./db";
 
 const initialState: AppState = {
   items: [],
+  logs: [],
   searchQuery: "",
   sortBy: "custom",
   isAscending: true,
@@ -35,6 +36,7 @@ export async function createItem(name: string, quantity: number, photo?: string,
     id: nanoid(),
     name,
     quantity,
+    confirmedValue: quantity, // 初期値は数量と同じ
     photo,
     memo,
     createdAt: now,
@@ -150,8 +152,38 @@ export function setView(view: "list" | "editor") {
   setState("view", view);
 }
 
-export function setCurrentTab(tab: "items" | "settings") {
+export function setCurrentTab(tab: "items" | "history" | "settings") {
   setState("currentTab", tab);
+}
+
+// 確定処理
+export async function confirmAllQuantities() {
+  const now = new Date();
+  const logs: Log[] = [];
+
+  for (const item of state.items) {
+    const diff = item.quantity - item.confirmedValue;
+    if (diff !== 0) {
+      logs.push({
+        id: crypto.randomUUID(),
+        itemId: item.id,
+        itemName: item.name,
+        delta: diff,
+        newValue: item.quantity,
+        timestamp: now.toISOString(),
+        type: diff > 0 ? "purchase" : "consume",
+      });
+
+      // confirmedValueを更新
+      await updateItem(item.id, { confirmedValue: item.quantity });
+    }
+  }
+
+  // ログを追加
+  if (logs.length > 0) {
+    setState("logs", (prevLogs) => [...logs, ...prevLogs]);
+    // TODO: ログをIndexedDBに保存
+  }
 }
 
 // エクスポート/インポート
