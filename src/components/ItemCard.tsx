@@ -18,7 +18,7 @@ interface ItemCardProps {
 }
 
 const ItemCard: Component<ItemCardProps> = (props) => {
-  const handleClick = () => {
+  const openItemEditor = () => {
     setSelectedItem(props.item.id);
     setView("editor");
   };
@@ -56,7 +56,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
     >
       {/* サムネイル画像 */}
       <button
-        onClick={handleClick}
+        onClick={openItemEditor}
         class="flex-shrink-0 px-3 transition-opacity hover:opacity-80 active:opacity-60"
       >
         {props.item.photo ? (
@@ -72,7 +72,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
 
       {/* 名前 */}
       <button
-        onClick={handleClick}
+        onClick={openItemEditor}
         class="flex-1 text-left transition-colors hover:text-blue-600 active:text-blue-700"
       >
         <h3 class="text-base font-medium text-gray-900">{props.item.name}</h3>
