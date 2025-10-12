@@ -35,15 +35,6 @@ const ItemCard: Component<ItemCardProps> = (props) => {
     decrementQuantity(props.item.id);
   };
 
-  // 差分を計算
-  const diff = () => props.item.quantity - props.item.confirmedValue;
-  const diffColor = () => {
-    const d = diff();
-    if (d > 0) return "text-green-600";
-    if (d < 0) return "text-red-600";
-    return "text-transparent"; // レイアウト維持のため透明
-  };
-
   return (
     <div
       data-item-index={props.index}
@@ -95,10 +86,6 @@ const ItemCard: Component<ItemCardProps> = (props) => {
           <Minus size={16} />
         </button>
         <div class="flex flex-col items-center">
-          {/* 差分表示（数量の隣） */}
-          <div class={`min-w-[3rem] text-center text-sm font-medium ${diffColor()}`}>
-            {diff() !== 0 ? `${diff() > 0 ? "+" : ""}${diff()}` : ""}
-          </div>
           <span
             class={`w-8 text-center text-sm font-medium ${
               props.item.quantity === 0 ? "text-red-600" : "text-gray-900"

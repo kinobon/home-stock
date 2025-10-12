@@ -5,7 +5,6 @@ export interface Item {
   id: ItemID;
   name: string;
   quantity: number;
-  confirmedValue: number; // 確定済み数量
   photo?: string;
   memo?: string;
   createdAt: Timestamp;
@@ -17,10 +16,10 @@ export interface Log {
   id: string; // UUID
   itemId: string;
   itemName: string;
-  delta: number; // 増減数
+  oldValue: number; // 変更前の数量
   newValue: number; // 変更後の数量
+  delta: number; // 増減数
   timestamp: string; // ISO8601形式
-  type: "purchase" | "consume"; // 購入 or 消費
 }
 
 export interface AppState {

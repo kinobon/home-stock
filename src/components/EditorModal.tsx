@@ -108,7 +108,6 @@ const EditorModal: Component = () => {
       console.error(error);
     }
   };
-
   const handleClose = () => {
     setSelectedItem(undefined);
     setView("list");

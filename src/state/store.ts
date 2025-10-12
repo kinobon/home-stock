@@ -7,7 +7,7 @@ import {
   deleteItem,
   clearAllItems,
   getAllLogs,
-  saveLogs,
+  saveLog,
   clearAllLogs,
 } from "./db";
 
@@ -27,18 +27,17 @@ export async function initializeStore() {
   const items = await getAllItems();
   const logs = await getAllLogs();
 
-  // 既存データのマイグレーション: confirmedValueがない場合は追加
+  // 既存データのマイグレーション: confirmedValueを削除
   const migratedItems = items.map((item) => {
-    if (item.confirmedValue === undefined) {
-      return { ...item, confirmedValue: item.quantity };
-    }
-    return item;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { confirmedValue, ...rest } = item as Item & { confirmedValue?: number };
+    return rest as Item;
   });
 
   // マイグレーションが必要な場合は保存
-  for (const item of migratedItems) {
-    if (items.find((i) => i.id === item.id)?.confirmedValue === undefined) {
-      await saveItem(item);
+  for (let i = 0; i < items.length; i++) {
+    if ("confirmedValue" in items[i]) {
+      await saveItem(migratedItems[i]);
     }
   }
 
@@ -59,7 +58,6 @@ export async function createItem(name: string, quantity: number, photo?: string,
     id: nanoid(),
     name,
     quantity,
-    confirmedValue: quantity, // 初期値は数量と同じ
     photo,
     memo,
     createdAt: now,
@@ -69,6 +67,12 @@ export async function createItem(name: string, quantity: number, photo?: string,
 
   await saveItem(newItem);
   setState("items", (items) => [...items, newItem]);
+
+  // 数量が0でない場合はログを記録（0から初期値への変更）
+  if (quantity !== 0) {
+    await addOrUpdateLog(newItem.id, newItem.name, 0, quantity);
+  }
+
   return newItem;
 }
 
@@ -80,46 +84,116 @@ export async function updateItem(
   const index = state.items.findIndex((item) => item.id === id);
   if (index === -1) return;
 
+  const oldItem = state.items[index];
+  // SolidJSのプロキシオブジェクトは後で変更されるので、必要な値を事前にコピー
+  const oldQuantity = oldItem.quantity;
+  const oldName = oldItem.name;
+  const oldId = oldItem.id;
+
   const updatedItem: Item = {
-    ...state.items[index],
+    ...oldItem,
     ...updates,
     updatedAt: Date.now(),
   };
 
   await saveItem(updatedItem);
   setState("items", index, updatedItem);
+
+  // 数量が変更された場合はログを記録
+  if (updates.quantity !== undefined && updates.quantity !== oldQuantity) {
+    await addOrUpdateLog(oldId, oldName, oldQuantity, updates.quantity);
+  }
 }
 
-// 数量増減
+// ログの追加または更新（同じ日・同じアイテムは統合）
+async function addOrUpdateLog(
+  itemId: string,
+  itemName: string,
+  oldValue: number,
+  newValue: number
+) {
+  const now = new Date();
+  const today = now.toISOString().split("T")[0]; // YYYY-MM-DD
+
+  // 今日の同じアイテムのログを探す
+  const existingLogIndex = state.logs.findIndex((log) => {
+    const logDate = log.timestamp.split("T")[0];
+    return log.itemId === itemId && logDate === today;
+  });
+
+  if (existingLogIndex !== -1) {
+    // 既存のログを更新
+    const existingLog = state.logs[existingLogIndex];
+    const updatedLog: Log = {
+      ...existingLog,
+      newValue: newValue,
+      delta: newValue - existingLog.oldValue,
+      timestamp: now.toISOString(),
+    };
+
+    // IndexedDBとstateを更新
+    await saveLog(updatedLog);
+    setState("logs", existingLogIndex, updatedLog);
+  } else {
+    // 新規ログを作成
+    const newLog: Log = {
+      id: crypto.randomUUID(),
+      itemId,
+      itemName,
+      oldValue,
+      newValue,
+      delta: newValue - oldValue,
+      timestamp: now.toISOString(),
+    };
+
+    await saveLog(newLog);
+    setState("logs", (logs) => [newLog, ...logs]);
+  }
+}
+
+// 数量増減（ログ記録付き）
 export async function incrementQuantity(id: string) {
   const index = state.items.findIndex((item) => item.id === id);
   if (index === -1) return;
 
+  const item = state.items[index];
+  const oldQuantity = item.quantity;
+  const newQuantity = oldQuantity + 1;
+
   const updatedItem: Item = {
-    ...state.items[index],
-    quantity: state.items[index].quantity + 1,
+    ...item,
+    quantity: newQuantity,
     updatedAt: Date.now(),
   };
 
   await saveItem(updatedItem);
   setState("items", index, updatedItem);
+
+  // ログを記録（統合）
+  await addOrUpdateLog(item.id, item.name, oldQuantity, newQuantity);
 }
 
 export async function decrementQuantity(id: string) {
   const index = state.items.findIndex((item) => item.id === id);
   if (index === -1) return;
 
-  const currentQuantity = state.items[index].quantity;
-  if (currentQuantity <= 0) return;
+  const item = state.items[index];
+  const oldQuantity = item.quantity;
+  if (oldQuantity <= 0) return;
+
+  const newQuantity = oldQuantity - 1;
 
   const updatedItem: Item = {
-    ...state.items[index],
-    quantity: currentQuantity - 1,
+    ...item,
+    quantity: newQuantity,
     updatedAt: Date.now(),
   };
 
   await saveItem(updatedItem);
   setState("items", index, updatedItem);
+
+  // ログを記録（統合）
+  await addOrUpdateLog(item.id, item.name, oldQuantity, newQuantity);
 }
 
 // アイテム削除
@@ -164,40 +238,10 @@ export function setCurrentTab(tab: "items" | "history" | "settings") {
   setState("currentTab", tab);
 }
 
-// 確定処理
-export async function confirmAllQuantities() {
-  const now = new Date();
-  const logs: Log[] = [];
-
-  for (const item of state.items) {
-    const diff = item.quantity - item.confirmedValue;
-    if (diff !== 0) {
-      logs.push({
-        id: crypto.randomUUID(),
-        itemId: item.id,
-        itemName: item.name,
-        delta: diff,
-        newValue: item.quantity,
-        timestamp: now.toISOString(),
-        type: diff > 0 ? "purchase" : "consume",
-      });
-
-      // confirmedValueを更新
-      await updateItem(item.id, { confirmedValue: item.quantity });
-    }
-  }
-
-  // ログを追加してIndexedDBに保存
-  if (logs.length > 0) {
-    await saveLogs(logs);
-    setState("logs", (prevLogs) => [...logs, ...prevLogs]);
-  }
-}
-
 // エクスポート/インポート
 export function exportData(): string {
   const exportData = {
-    version: "2.0.0", // ログ対応のため2.0.0に
+    version: "3.0.0", // confirmedValue削除のため3.0.0に
     exportedAt: Date.now(),
     items: state.items,
     logs: state.logs,
@@ -242,23 +286,32 @@ export async function importData(jsonString: string) {
     await clearAllLogs();
 
     for (const item of data.items) {
-      // confirmedValueがない場合は追加
-      if (item.confirmedValue === undefined) {
-        item.confirmedValue = item.quantity;
-      }
-      await saveItem(item);
+      // confirmedValueがある場合は削除（旧バージョンとの互換性）
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { confirmedValue, ...cleanItem } = item as Item & { confirmedValue?: number };
+      await saveItem(cleanItem);
     }
 
     // ログがある場合はインポート
     if (data.logs && Array.isArray(data.logs)) {
-      await saveLogs(data.logs);
+      // 各ログを個別に保存
+      for (const log of data.logs) {
+        await saveLog(log);
+      }
       setState("logs", data.logs);
       console.log(`[importData] Imported ${data.logs.length} logs`);
     } else {
       setState("logs", []);
     }
 
-    setState("items", data.items);
+    setState(
+      "items",
+      data.items.map((item: Item & { confirmedValue?: number }) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { confirmedValue, ...cleanItem } = item;
+        return cleanItem;
+      })
+    );
     console.log("[importData] Import completed successfully");
   } catch (error) {
     console.error("[importData] Import failed:", error);
