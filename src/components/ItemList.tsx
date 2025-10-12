@@ -24,11 +24,6 @@ import { useUIState } from "../context/UIStateContext";
 const ItemList: Component = () => {
   const [, { setHeader, setBottomNav, setFab }] = useUIState();
 
-  // 差分のある項目数をカウント
-  const diffCount = createMemo(() => {
-    return state.items.filter((item) => item.quantity !== item.confirmedValue).length;
-  });
-
   // 検索バーとカスタムコンテンツを動的に生成
   const searchBar = createMemo(() => (
     <div class="flex flex-col gap-2">
@@ -54,13 +49,6 @@ const ItemList: Component = () => {
           </button>
         )}
       </div>
-
-      {/* 差分数の表示 */}
-      {diffCount() > 0 && (
-        <div class="rounded-lg bg-blue-50 px-4 py-2 text-sm text-blue-700">
-          <span class="font-medium">{diffCount()}件</span>の変更があります
-        </div>
-      )}
     </div>
   ));
 
