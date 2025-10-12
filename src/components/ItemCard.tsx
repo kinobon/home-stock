@@ -50,12 +50,14 @@ const ItemCard: Component<ItemCardProps> = (props) => {
       onDragOver={props.onDragOver}
       onDragEnd={props.onDragEnd}
       onDragLeave={props.onDragLeave}
-      class={"flex w-full items-center gap-1 border-b border-gray-200 bg-white transition-all"}
+      class={
+        "flex h-14 w-full items-center gap-1 border-b border-gray-200 bg-white transition-all [&>*]:h-full"
+      }
     >
       {/* サムネイル画像 */}
       <button
         onClick={handleClick}
-        class="flex-shrink-0 p-3 transition-opacity hover:opacity-80 active:opacity-60"
+        class="flex-shrink-0 px-3 transition-opacity hover:opacity-80 active:opacity-60"
       >
         {props.item.photo ? (
           <div class="relative size-10 overflow-hidden rounded-lg bg-gray-100">
