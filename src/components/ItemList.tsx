@@ -1,14 +1,4 @@
-import {
-  For,
-  createMemo,
-  createSignal,
-  onMount,
-  onCleanup,
-  Show,
-  type Component,
-  batch,
-} from "solid-js";
-import { Portal } from "solid-js/web";
+import { For, createMemo, createSignal, onMount, onCleanup, type Component, batch } from "solid-js";
 import {
   state,
   reorderItems,
@@ -100,9 +90,6 @@ const ItemList: Component = () => {
   });
   const [draggedId, setDraggedId] = createSignal<string | null>(null);
   const [dragOverIndex, setDragOverIndex] = createSignal<number | null>(null);
-  const [dragPosition, setDragPosition] = createSignal<{ x: number; y: number } | null>(null);
-  const [containerWidth, setContainerWidth] = createSignal<number>(0);
-  const [containerLeft, setContainerLeft] = createSignal<number>(0);
   let containerRef: HTMLDivElement | undefined;
   let itemListRef: HTMLDivElement | undefined;
   let scrollContainerRef: HTMLElement | null = null;
@@ -111,13 +98,6 @@ const ItemList: Component = () => {
   onMount(() => {
     // 親のスクロールコンテナを探す
     if (containerRef) {
-      // アイテムリストの実際の幅と位置を取得
-      if (itemListRef) {
-        const rect = itemListRef.getBoundingClientRect();
-        setContainerWidth(rect.width);
-        setContainerLeft(rect.left);
-      }
-
       let parent = containerRef.parentElement;
       while (parent) {
         const overflowY = window.getComputedStyle(parent).overflowY;
@@ -220,18 +200,6 @@ const ItemList: Component = () => {
     e.stopPropagation(); // イベント伝播を停止
     const items = filteredAndSortedItems();
     setDraggedId(items[index].id);
-
-    // ドラッグ開始時にコンテナの幅と位置を取得
-    if (itemListRef) {
-      const rect = itemListRef.getBoundingClientRect();
-      setContainerWidth(rect.width);
-      setContainerLeft(rect.left);
-    }
-
-    const touch = e.touches[0];
-    if (touch) {
-      setDragPosition({ x: touch.clientX, y: touch.clientY });
-    }
   };
 
   const handleHandleTouchMove = (e: TouchEvent) => {
@@ -240,9 +208,6 @@ const ItemList: Component = () => {
 
     const touch = e.touches[0];
     if (!touch) return;
-
-    // ドラッグ位置を更新
-    setDragPosition({ x: touch.clientX, y: touch.clientY });
 
     // 自動スクロール処理
     if (scrollContainerRef) {
@@ -303,9 +268,6 @@ const ItemList: Component = () => {
       autoScrollInterval = undefined;
     }
 
-    // ドラッグ位置をクリア
-    setDragPosition(null);
-
     handleDragEnd();
   };
 
@@ -343,50 +305,6 @@ const ItemList: Component = () => {
           </div>
         )}
       </div>
-
-      {/* ドラッグ中のゴースト要素 */}
-      <Show when={draggedId() !== null && dragPosition() && containerWidth() > 0}>
-        {(() => {
-          const items = filteredAndSortedItems();
-          const dragId = draggedId();
-          const draggedItem = items.find((item) => item.id === dragId);
-          const dragIdx = items.findIndex((item) => item.id === dragId);
-
-          if (!draggedItem || dragIdx === -1) return null;
-
-          return (
-            <Portal>
-              <div
-                class="pointer-events-none fixed z-50"
-                style={{
-                  left: `${containerLeft()}px`,
-                  top: `${dragPosition()!.y}px`,
-                  width: `${containerWidth()}px`,
-                  transform: "translateY(-50%)",
-                  "box-shadow":
-                    "0 -8px 15px -3px rgba(0, 0, 0, 0.06), 0 8px 15px -3px rgba(0, 0, 0, 0.06), 0 -2px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 6px -1px rgba(0, 0, 0, 0.03)",
-                }}
-              >
-                <div class="opacity-90">
-                  <ItemCard
-                    item={draggedItem}
-                    index={dragIdx}
-                    isDragging={false}
-                    isDragOver={false}
-                    onDragStart={() => {}}
-                    onDragOver={() => {}}
-                    onDragEnd={() => {}}
-                    onDragLeave={() => {}}
-                    onHandleTouchStart={() => {}}
-                    onHandleTouchMove={() => {}}
-                    onHandleTouchEnd={() => {}}
-                  />
-                </div>
-              </div>
-            </Portal>
-          );
-        })()}
-      </Show>
     </>
   );
 };

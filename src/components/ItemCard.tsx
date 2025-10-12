@@ -54,7 +54,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
       onDragLeave={props.onDragLeave}
       class={clsx(
         "flex h-14 w-full items-center gap-1 border-b border-gray-200 bg-white transition-all [&>*]:h-full",
-        props.isDragging && "opacity-50"
+        props.isDragging && "-translate-y-1 transform opacity-50 shadow-lg"
       )}
     >
       {/* サムネイル画像 */}
