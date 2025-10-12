@@ -50,7 +50,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
       onDragOver={props.onDragOver}
       onDragEnd={props.onDragEnd}
       onDragLeave={props.onDragLeave}
-      class={"flex w-full items-center gap-3 border-b border-gray-200 bg-white transition-all"}
+      class={"flex w-full items-center gap-1 border-b border-gray-200 bg-white transition-all"}
     >
       {/* サムネイル画像 */}
       <button
@@ -90,6 +90,10 @@ const ItemCard: Component<ItemCardProps> = (props) => {
           <Minus size={16} />
         </button>
         <div class="flex flex-col items-center">
+          {/* 差分表示（数量の隣） */}
+          <div class={`min-w-[3rem] text-center text-sm font-medium ${diffColor()}`}>
+            {diff() !== 0 ? `${diff() > 0 ? "+" : ""}${diff()}` : ""}
+          </div>
           <span
             class={`w-8 text-center text-sm font-medium ${
               props.item.quantity === 0 ? "text-red-600" : "text-gray-900"
@@ -105,11 +109,6 @@ const ItemCard: Component<ItemCardProps> = (props) => {
         >
           <Plus size={16} />
         </button>
-
-        {/* 差分表示（数量の隣） */}
-        <div class={`min-w-[3rem] text-center text-sm font-medium ${diffColor()}`}>
-          {diff() !== 0 ? `${diff() > 0 ? "+" : ""}${diff()}` : ""}
-        </div>
       </div>
 
       {/* ドラッグハンドル（常に表示） */}
