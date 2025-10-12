@@ -205,7 +205,9 @@ export async function removeItem(id: string) {
 // すべてクリア
 export async function clearAll() {
   await clearAllItems();
+  await clearAllLogs();
   setState("items", []);
+  setState("logs", []);
 }
 
 // UI State
@@ -263,7 +265,7 @@ export async function importData(jsonString: string) {
     }
 
     if (!Array.isArray(data.items)) {
-      throw new Error("items フィールドは配列である必要があります");
+      throw new Error("items は配列である必要があります");
     }
 
     // 各アイテムの基本的なバリデーション
@@ -279,12 +281,18 @@ export async function importData(jsonString: string) {
       }
     }
 
-    console.log(`[importData] Validated ${data.items.length} items`);
+    // ログのバリデーション（ログがある場合）
+    if (data.logs !== undefined) {
+      if (!Array.isArray(data.logs)) {
+        throw new Error("logs は配列である必要があります");
+      }
+    }
 
     // データベースをクリアしてインポート
     await clearAllItems();
     await clearAllLogs();
 
+    // アイテムをインポート
     for (const item of data.items) {
       // confirmedValueがある場合は削除（旧バージョンとの互換性）
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -292,18 +300,17 @@ export async function importData(jsonString: string) {
       await saveItem(cleanItem);
     }
 
-    // ログがある場合はインポート
+    // ログをインポート
     if (data.logs && Array.isArray(data.logs)) {
-      // 各ログを個別に保存
       for (const log of data.logs) {
         await saveLog(log);
       }
       setState("logs", data.logs);
-      console.log(`[importData] Imported ${data.logs.length} logs`);
     } else {
       setState("logs", []);
     }
 
+    // ステートを更新
     setState(
       "items",
       data.items.map((item: Item & { confirmedValue?: number }) => {
@@ -312,9 +319,8 @@ export async function importData(jsonString: string) {
         return cleanItem;
       })
     );
-    console.log("[importData] Import completed successfully");
   } catch (error) {
-    console.error("[importData] Import failed:", error);
+    console.error("Import failed:", error);
     if (error instanceof SyntaxError) {
       throw new Error("無効なJSON形式です");
     }

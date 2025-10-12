@@ -48,23 +48,23 @@ const Settings: Component = () => {
   });
   const handleExport = () => {
     try {
-      console.log("[Export] Starting export...");
       const data = exportData();
       const blob = new Blob([data], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5);
       a.href = url;
-      a.download = `home-stock-backup-${Date.now()}.json`;
+      a.download = `home-stock-backup-${timestamp}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      console.log("[Export] Export completed successfully");
+
       setTimeout(() => {
         alert("✅ エクスポートが完了しました");
       }, 100);
     } catch (error) {
-      console.error("[Export] Export failed:", error);
+      console.error("Export failed:", error);
       alert("❌ エクスポートに失敗しました");
     }
   };
@@ -75,21 +75,22 @@ const Settings: Component = () => {
     input.accept = "application/json";
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) {
-        console.log("[Import] No file selected");
+      if (!file) return;
+
+      // 確認ダイアログ
+      if (!confirm("インポートすると現在のデータがすべて上書きされます。\n続行しますか？")) {
         return;
       }
 
       try {
-        console.log("[Import] Starting import from file:", file.name);
         const text = await file.text();
-        console.log("[Import] File content read, length:", text.length);
         await importData(text);
-        console.log("[Import] Import completed successfully");
-        alert("✅ データをインポートしました");
+        alert("✅ データをインポートしました\n\nページをリロードします");
+        // リロードして最新のデータを表示
+        window.location.reload();
       } catch (error) {
-        console.error("[Import] Import failed:", error);
-        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        console.error("Import failed:", error);
+        const errorMessage = error instanceof Error ? error.message : "不明なエラー";
         alert(`❌ インポートに失敗しました\n\n${errorMessage}`);
       }
     };
@@ -97,16 +98,25 @@ const Settings: Component = () => {
   };
 
   const handleClearAll = async () => {
-    if (confirm("すべてのデータを削除しますか？この操作は取り消せません。")) {
-      try {
-        console.log("[ClearAll] Starting clear all...");
-        await clearAll();
-        console.log("[ClearAll] Clear all completed successfully");
-        alert("✅ すべてのデータを削除しました");
-      } catch (error) {
-        console.error("[ClearAll] Clear all failed:", error);
-        alert("❌ データの削除に失敗しました");
-      }
+    if (
+      !confirm(
+        "すべてのデータを削除しますか？\n\n・すべてのアイテム\n・すべての履歴\n\nこの操作は取り消せません。"
+      )
+    ) {
+      return;
+    }
+
+    // 2回目の確認
+    if (!confirm("本当に削除しますか？")) {
+      return;
+    }
+
+    try {
+      await clearAll();
+      alert("✅ すべてのデータを削除しました");
+    } catch (error) {
+      console.error("Clear all failed:", error);
+      alert("❌ データの削除に失敗しました");
     }
   };
 
