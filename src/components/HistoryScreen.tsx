@@ -91,7 +91,7 @@ const HistoryScreen: Component = () => {
                     class={`text-lg font-bold ${log.delta > 0 ? "text-green-600" : "text-red-600"}`}
                   >
                     {log.delta > 0 ? "+" : ""}
-                    {log.delta}枚
+                    {log.delta}個
                   </div>
 
                   {/* ラベル */}
