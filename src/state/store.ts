@@ -174,7 +174,7 @@ export function setSelectedItem(id?: string) {
   setState("selectedItemId", id);
 }
 
-export function setView(view: "list" | "editor") {
+export function setView(view: "list" | "editor" | "counter") {
   setState("view", view);
 }
 
