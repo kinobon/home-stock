@@ -2,11 +2,13 @@ import type { Component } from "solid-js";
 import { setSelectedItem, setView, incrementQuantity, decrementQuantity } from "../state/store";
 import type { Item } from "../types";
 import { GripVertical, Minus, Plus } from "lucide-solid";
+import clsx from "clsx";
 
 interface ItemCardProps {
   item: Item;
   index: number;
   isDragging: boolean;
+  dragClass?: string;
   isDragOver: boolean;
   onDragStart: () => void;
   onDragOver: (e: DragEvent) => void;
@@ -50,9 +52,10 @@ const ItemCard: Component<ItemCardProps> = (props) => {
       onDragOver={props.onDragOver}
       onDragEnd={props.onDragEnd}
       onDragLeave={props.onDragLeave}
-      class={
-        "flex h-14 w-full items-center gap-1 border-b border-gray-200 bg-white transition-all [&>*]:h-full"
-      }
+      class={clsx(
+        "flex h-14 w-full items-center gap-1 border-b border-gray-200 bg-white transition-all [&>*]:h-full",
+        props.isDragging && "opacity-50"
+      )}
     >
       {/* サムネイル画像 */}
       <button
