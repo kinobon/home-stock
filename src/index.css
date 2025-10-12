@@ -144,3 +144,7 @@ textarea,
     background: rgba(0, 0, 0, 0.4);
   }
 }
+
+@theme {
+  --default-transition-duration: 50ms;
+}
