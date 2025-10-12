@@ -77,7 +77,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
       </button>
 
       {/* 数量コントロールと差分表示 */}
-      <div class="flex items-center gap-2 pr-3">
+      <div class="flex items-center gap-2">
         <button
           onClick={handleDecrement}
           class={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
