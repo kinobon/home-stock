@@ -12,33 +12,25 @@ import { Portal } from "solid-js/web";
 import {
   state,
   reorderItems,
-  setView,
   setCurrentTab,
   setSearchQuery,
-  setSortBy,
-  toggleSortOrder,
-  setEditMode,
+  setSelectedItem,
+  setView,
 } from "../state/store";
 import ItemCard from "./ItemCard";
-import {
-  Package,
-  Plus,
-  Settings as SettingsIcon,
-  Search,
-  X,
-  ArrowUpDown,
-  Edit3,
-  Check,
-  Clock,
-  Calculator,
-} from "lucide-solid";
+import { Package, Plus, Settings as SettingsIcon, Search, X, Clock } from "lucide-solid";
 import { useUIState } from "../context/UIStateContext";
 
 const ItemList: Component = () => {
   const [, { setHeader, setBottomNav, setFab }] = useUIState();
 
-  // 検索バーとソート機能のカスタムコンテンツを動的に生成
-  const searchAndSort = createMemo(() => (
+  // 差分のある項目数をカウント
+  const diffCount = createMemo(() => {
+    return state.items.filter((item) => item.quantity !== item.confirmedValue).length;
+  });
+
+  // 検索バーとカスタムコンテンツを動的に生成
+  const searchBar = createMemo(() => (
     <div class="flex flex-col gap-2">
       {/* 検索バー */}
       <div class="relative">
@@ -49,9 +41,6 @@ const ItemList: Component = () => {
           value={state.searchQuery}
           onInput={(e) => {
             setSearchQuery(e.currentTarget.value);
-            if (state.isEditMode) {
-              setEditMode(false);
-            }
           }}
           class="w-full rounded-lg border border-gray-300 bg-gray-50 py-2 pr-10 pl-10 text-sm transition-all focus:border-blue-500 focus:bg-white focus:shadow-md focus:outline-none"
         />
@@ -66,101 +55,12 @@ const ItemList: Component = () => {
         )}
       </div>
 
-      {/* コンパクトなツールバー */}
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        {/* ソートグループ（セグメントボタン） */}
-        <div class="inline-flex overflow-hidden rounded-lg bg-gray-100 shadow-sm">
-          <button
-            onClick={() => {
-              setSortBy("name");
-              if (state.isEditMode) {
-                setEditMode(false);
-              }
-            }}
-            class={`px-3 py-2 text-xs font-medium transition-colors sm:text-sm ${
-              state.sortBy === "name" ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            名前順
-          </button>
-          <button
-            onClick={() => {
-              setSortBy("quantity");
-              if (state.isEditMode) {
-                setEditMode(false);
-              }
-            }}
-            class={`px-3 py-2 text-xs font-medium transition-colors sm:text-sm ${
-              state.sortBy === "quantity"
-                ? "bg-blue-600 text-white"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            数量順
-          </button>
-          <button
-            onClick={() => setSortBy("custom")}
-            class={`px-3 py-2 text-xs font-medium transition-colors sm:text-sm ${
-              state.sortBy === "custom"
-                ? "bg-blue-600 text-white"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            カスタム
-          </button>
-          <button
-            onClick={toggleSortOrder}
-            disabled={state.sortBy === "custom"}
-            class={`flex items-center gap-1 px-3 py-2 text-xs font-medium transition-colors sm:text-sm ${
-              state.sortBy === "custom"
-                ? "cursor-not-allowed text-gray-400"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
-            title={state.isAscending ? "昇順" : "降順"}
-          >
-            <ArrowUpDown size={16} />
-          </button>
+      {/* 差分数の表示 */}
+      {diffCount() > 0 && (
+        <div class="rounded-lg bg-blue-50 px-4 py-2 text-sm text-blue-700">
+          <span class="font-medium">{diffCount()}件</span>の変更があります
         </div>
-
-        {/* 右側ボタングループ */}
-        <div class="flex items-center gap-2">
-          {/* 数量調整ボタン */}
-          <button
-            onClick={() => setView("counter")}
-            class="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-blue-700"
-          >
-            <Calculator size={16} />
-            数量調整
-          </button>
-
-          {/* 編集モード切り替えボタン（カスタムソート時は常に表示） */}
-          <button
-            onClick={() => {
-              setEditMode(!state.isEditMode);
-            }}
-            disabled={state.sortBy !== "custom" || state.searchQuery.trim() !== ""}
-            class={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium shadow-sm transition-all ${
-              state.sortBy !== "custom" || state.searchQuery.trim() !== ""
-                ? "cursor-not-allowed bg-gray-400 text-gray-200"
-                : state.isEditMode
-                  ? "bg-green-600 text-white hover:bg-green-700"
-                  : "bg-gray-600 text-white hover:bg-gray-700"
-            }`}
-          >
-            {state.isEditMode ? (
-              <>
-                <Check size={16} />
-                完了
-              </>
-            ) : (
-              <>
-                <Edit3 size={16} />
-                編集
-              </>
-            )}
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   ));
 
@@ -170,7 +70,7 @@ const ItemList: Component = () => {
       setHeader({
         title: "備品管理",
         visible: true,
-        customContent: searchAndSort(),
+        customContent: searchBar(),
       });
 
       setBottomNav({
@@ -204,9 +104,7 @@ const ItemList: Component = () => {
         visible: true,
         icon: <Plus size={28} strokeWidth={2.5} />,
         onClick: () => {
-          if (state.isEditMode) {
-            setEditMode(false);
-          }
+          setSelectedItem(undefined);
           setView("editor");
         },
       });
@@ -264,21 +162,8 @@ const ItemList: Component = () => {
       );
     }
 
-    // ソート
-    if (state.sortBy === "custom") {
-      // カスタム並び順（ドラッグ&ドロップ後）
-      items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-    } else if (state.sortBy === "name") {
-      items.sort((a, b) => {
-        const comparison = a.name.localeCompare(b.name, "ja");
-        return state.isAscending ? comparison : -comparison;
-      });
-    } else if (state.sortBy === "quantity") {
-      items.sort((a, b) => {
-        const comparison = a.quantity - b.quantity;
-        return state.isAscending ? comparison : -comparison;
-      });
-    }
+    // 常にカスタム並び順を使用
+    items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
     return items;
   });
@@ -301,18 +186,15 @@ const ItemList: Component = () => {
   });
 
   const handleDragStart = (index: number) => {
-    if (!state.isEditMode) return;
     setDraggedIndex(index);
   };
 
   const handleDragOver = (e: DragEvent, index: number) => {
-    if (!state.isEditMode) return;
     e.preventDefault();
     setDragOverIndex(index);
   };
 
   const handleDragEnd = () => {
-    if (!state.isEditMode) return;
     const dragIdx = draggedIndex();
     const overIdx = dragOverIndex();
 
@@ -331,13 +213,11 @@ const ItemList: Component = () => {
   };
 
   const handleDragLeave = () => {
-    if (!state.isEditMode) return;
     setDragOverIndex(null);
   };
 
   // タッチイベントハンドラー（つまみアイコン用）
   const handleHandleTouchStart = (index: number, e: TouchEvent) => {
-    if (!state.isEditMode) return;
     e.stopPropagation(); // イベント伝播を停止
     setDraggedIndex(index);
 
@@ -355,7 +235,7 @@ const ItemList: Component = () => {
   };
 
   const handleHandleTouchMove = (e: TouchEvent) => {
-    if (!state.isEditMode || draggedIndex() === null) return;
+    if (draggedIndex() === null) return;
     e.preventDefault(); // スクロール防止
 
     const touch = e.touches[0];
@@ -417,8 +297,6 @@ const ItemList: Component = () => {
   };
 
   const handleHandleTouchEnd = () => {
-    if (!state.isEditMode) return;
-
     // 自動スクロール停止
     if (autoScrollInterval) {
       clearInterval(autoScrollInterval);
@@ -450,7 +328,6 @@ const ItemList: Component = () => {
                 <ItemCard
                   item={item}
                   index={index()}
-                  isDraggable={state.isEditMode}
                   isDragging={draggedIndex() === index()}
                   isDragOver={false}
                   onDragStart={() => handleDragStart(index())}
@@ -485,7 +362,6 @@ const ItemList: Component = () => {
               <ItemCard
                 item={filteredAndSortedItems()[draggedIndex()!]}
                 index={draggedIndex()!}
-                isDraggable={true}
                 isDragging={false}
                 isDragOver={false}
                 onDragStart={() => {}}

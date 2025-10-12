@@ -4,7 +4,6 @@ import { state, initializeStore } from "./state/store";
 import Header from "./components/Header";
 import ItemList from "./components/ItemList";
 import EditorModal from "./components/EditorModal";
-import CounterScreen from "./components/CounterScreen";
 import HistoryScreen from "./components/HistoryScreen";
 import BottomNav from "./components/BottomNav";
 import Settings from "./components/Settings";
@@ -63,11 +62,8 @@ const App: Component = () => {
 
         {/* タブコンテンツ（スクロール可能エリア） */}
         <div ref={applyTransition} class="flex-1 overflow-y-auto overscroll-contain">
-          <Show when={state.currentTab === "items" && state.view === "list"}>
+          <Show when={state.currentTab === "items"}>
             <ItemList />
-          </Show>
-          <Show when={state.currentTab === "items" && state.view === "counter"}>
-            <CounterScreen />
           </Show>
           <Show when={state.currentTab === "history"}>
             <HistoryScreen />

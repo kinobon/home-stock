@@ -1,18 +1,11 @@
 import type { Component } from "solid-js";
-import {
-  setSelectedItem,
-  setView,
-  incrementQuantity,
-  decrementQuantity,
-  removeItem,
-} from "../state/store";
+import { setSelectedItem, setView, incrementQuantity, decrementQuantity } from "../state/store";
 import type { Item } from "../types";
-import { GripVertical, Minus, Plus, Trash2 } from "lucide-solid";
+import { GripVertical, Minus, Plus } from "lucide-solid";
 
 interface ItemCardProps {
   item: Item;
   index: number;
-  isDraggable: boolean;
   isDragging: boolean;
   isDragOver: boolean;
   onDragStart: () => void;
@@ -26,7 +19,6 @@ interface ItemCardProps {
 
 const ItemCard: Component<ItemCardProps> = (props) => {
   const handleClick = () => {
-    if (props.isDraggable) return; // 編集モード中はクリック無効
     setSelectedItem(props.item.id);
     setView("editor");
   };
@@ -41,17 +33,19 @@ const ItemCard: Component<ItemCardProps> = (props) => {
     decrementQuantity(props.item.id);
   };
 
-  const handleDelete = (e: MouseEvent) => {
-    e.stopPropagation();
-    if (confirm(`「${props.item.name}」を削除しますか？`)) {
-      removeItem(props.item.id);
-    }
+  // 差分を計算
+  const diff = () => props.item.quantity - props.item.confirmedValue;
+  const diffColor = () => {
+    const d = diff();
+    if (d > 0) return "text-green-600";
+    if (d < 0) return "text-red-600";
+    return "text-transparent"; // レイアウト維持のため透明
   };
 
   return (
     <div
       data-item-index={props.index}
-      draggable={props.isDraggable}
+      draggable={true}
       onDragStart={props.onDragStart}
       onDragOver={props.onDragOver}
       onDragEnd={props.onDragEnd}
@@ -61,10 +55,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
       {/* サムネイル画像 */}
       <button
         onClick={handleClick}
-        disabled={props.isDraggable}
-        class={`flex-shrink-0 p-3 transition-opacity ${
-          props.isDraggable ? "" : "hover:opacity-80 active:opacity-60"
-        }`}
+        class="flex-shrink-0 p-3 transition-opacity hover:opacity-80 active:opacity-60"
       >
         {props.item.photo ? (
           <div class="relative size-10 overflow-hidden rounded-lg bg-gray-100">
@@ -80,69 +71,56 @@ const ItemCard: Component<ItemCardProps> = (props) => {
       {/* 名前 */}
       <button
         onClick={handleClick}
-        disabled={props.isDraggable}
-        class={`flex-1 text-left transition-colors ${
-          props.isDraggable ? "" : "hover:text-blue-600 active:text-blue-700"
-        }`}
+        class="flex-1 text-left transition-colors hover:text-blue-600 active:text-blue-700"
       >
         <h3 class="text-base font-medium text-gray-900">{props.item.name}</h3>
       </button>
 
-      {/* 数量コントロール */}
-      {!props.isDraggable && (
-        <div class="flex items-center gap-2 pr-3">
-          <button
-            onClick={handleDecrement}
-            class={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
-              props.item.quantity === 0
-                ? "cursor-not-allowed bg-gray-100 text-gray-300"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300"
-            } `}
-            disabled={props.item.quantity === 0}
+      {/* 数量コントロールと差分表示 */}
+      <div class="flex items-center gap-2 pr-3">
+        <button
+          onClick={handleDecrement}
+          class={`flex h-10 w-10 items-center justify-center rounded-full transition-colors ${
+            props.item.quantity === 0
+              ? "cursor-not-allowed bg-gray-100 text-gray-300"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300"
+          } `}
+          disabled={props.item.quantity === 0}
+        >
+          <Minus size={16} />
+        </button>
+        <div class="flex flex-col items-center">
+          <span
+            class={`w-8 text-center text-sm font-medium ${
+              props.item.quantity === 0 ? "text-red-600" : "text-gray-900"
+            }`}
           >
-            <Minus size={16} />
-          </button>
-          <div class="flex flex-col items-center">
-            <span
-              class={`w-8 text-center text-sm font-medium ${
-                props.item.quantity === 0 ? "text-red-600" : "text-gray-900"
-              }`}
-            >
-              {props.item.quantity}
-            </span>
-            <span class="text-[0.62rem] text-gray-600">数量</span>
-          </div>
-          <button
-            onClick={handleIncrement}
-            class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 active:bg-gray-300"
-          >
-            <Plus size={16} />
-          </button>
+            {props.item.quantity}
+          </span>
+          <span class="text-[0.62rem] text-gray-600">数量</span>
         </div>
-      )}
+        <button
+          onClick={handleIncrement}
+          class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 active:bg-gray-300"
+        >
+          <Plus size={16} />
+        </button>
 
-      {/* ドラッグハンドル（編集モード時のみ表示・右側） */}
-      {props.isDraggable && (
-        <>
-          {/* 削除ボタン */}
-          <button
-            onClick={handleDelete}
-            class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-600 transition-colors hover:bg-red-200 active:bg-red-300"
-          >
-            <Trash2 size={18} />
-          </button>
+        {/* 差分表示（数量の隣） */}
+        <div class={`min-w-[3rem] text-center text-sm font-medium ${diffColor()}`}>
+          {diff() !== 0 ? `${diff() > 0 ? "+" : ""}${diff()}` : ""}
+        </div>
+      </div>
 
-          {/* ドラッグハンドル */}
-          <div
-            class="flex h-full cursor-grab touch-none items-center px-3 text-gray-400 active:cursor-grabbing"
-            onTouchStart={props.onHandleTouchStart}
-            onTouchMove={props.onHandleTouchMove}
-            onTouchEnd={props.onHandleTouchEnd}
-          >
-            <GripVertical size={20} />
-          </div>
-        </>
-      )}
+      {/* ドラッグハンドル（常に表示） */}
+      <div
+        class="flex h-full cursor-grab touch-none items-center px-3 text-gray-400 active:cursor-grabbing"
+        onTouchStart={props.onHandleTouchStart}
+        onTouchMove={props.onHandleTouchMove}
+        onTouchEnd={props.onHandleTouchEnd}
+      >
+        <GripVertical size={20} />
+      </div>
     </div>
   );
 };

@@ -27,12 +27,9 @@ export interface AppState {
   items: Item[];
   logs: Log[];
   searchQuery: string;
-  sortBy: "name" | "quantity" | "custom";
-  isAscending: boolean;
   selectedItemId?: ItemID;
   view: "list" | "editor" | "counter";
   currentTab: "items" | "history" | "settings";
-  isEditMode: boolean;
 }
 
 export interface ExportData {
