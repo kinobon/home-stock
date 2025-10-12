@@ -55,9 +55,7 @@ const Settings: Component = () => {
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5);
       a.href = url;
       a.download = `home-stock-backup-${timestamp}.json`;
-      document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
       setTimeout(() => {
