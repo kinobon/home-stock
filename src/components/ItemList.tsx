@@ -98,7 +98,7 @@ const ItemList: Component = () => {
       });
     });
   });
-  const [draggedIndex, setDraggedIndex] = createSignal<number | null>(null);
+  const [draggedId, setDraggedId] = createSignal<string | null>(null);
   const [dragOverIndex, setDragOverIndex] = createSignal<number | null>(null);
   const [dragPosition, setDragPosition] = createSignal<{ x: number; y: number } | null>(null);
   const [containerWidth, setContainerWidth] = createSignal<number>(0);
@@ -156,13 +156,19 @@ const ItemList: Component = () => {
     return items;
   });
 
-  // ドラッグ中の表示順序（視覚的フィードバック用）
+  // ドラッグ中の表示順序(視覚的フィードバック用)
   const displayItems = createMemo(() => {
     const items = filteredAndSortedItems();
-    const dragIdx = draggedIndex();
+    const dragId = draggedId();
     const overIdx = dragOverIndex();
 
-    if (dragIdx === null || overIdx === null || dragIdx === overIdx) {
+    if (dragId === null || overIdx === null) {
+      return items;
+    }
+
+    // ドラッグ中のアイテムのインデックスを取得
+    const dragIdx = items.findIndex((item) => item.id === dragId);
+    if (dragIdx === -1 || dragIdx === overIdx) {
       return items;
     }
 
@@ -174,7 +180,8 @@ const ItemList: Component = () => {
   });
 
   const handleDragStart = (index: number) => {
-    setDraggedIndex(index);
+    const items = filteredAndSortedItems();
+    setDraggedId(items[index].id);
   };
 
   const handleDragOver = (e: DragEvent, index: number) => {
@@ -183,20 +190,24 @@ const ItemList: Component = () => {
   };
 
   const handleDragEnd = () => {
-    const dragIdx = draggedIndex();
+    const dragId = draggedId();
     const overIdx = dragOverIndex();
 
-    if (dragIdx !== null && overIdx !== null && dragIdx !== overIdx) {
+    if (dragId !== null && overIdx !== null) {
       const items = filteredAndSortedItems();
-      const newOrder = [...items];
-      const [removed] = newOrder.splice(dragIdx, 1);
-      newOrder.splice(overIdx, 0, removed);
+      const dragIdx = items.findIndex((item) => item.id === dragId);
 
-      const newOrderIds = newOrder.map((item) => item.id);
-      reorderItems(newOrderIds);
+      if (dragIdx !== -1 && dragIdx !== overIdx) {
+        const newOrder = [...items];
+        const [removed] = newOrder.splice(dragIdx, 1);
+        newOrder.splice(overIdx, 0, removed);
+
+        const newOrderIds = newOrder.map((item) => item.id);
+        reorderItems(newOrderIds);
+      }
     }
 
-    setDraggedIndex(null);
+    setDraggedId(null);
     setDragOverIndex(null);
   };
 
@@ -207,7 +218,8 @@ const ItemList: Component = () => {
   // タッチイベントハンドラー（つまみアイコン用）
   const handleHandleTouchStart = (index: number, e: TouchEvent) => {
     e.stopPropagation(); // イベント伝播を停止
-    setDraggedIndex(index);
+    const items = filteredAndSortedItems();
+    setDraggedId(items[index].id);
 
     // ドラッグ開始時にコンテナの幅と位置を取得
     if (itemListRef) {
@@ -223,7 +235,7 @@ const ItemList: Component = () => {
   };
 
   const handleHandleTouchMove = (e: TouchEvent) => {
-    if (draggedIndex() === null) return;
+    if (draggedId() === null) return;
     e.preventDefault(); // スクロール防止
 
     const touch = e.touches[0];
@@ -316,7 +328,7 @@ const ItemList: Component = () => {
                 <ItemCard
                   item={item}
                   index={index()}
-                  isDragging={draggedIndex() === index()}
+                  isDragging={draggedId() === item.id}
                   isDragOver={false}
                   onDragStart={() => handleDragStart(index())}
                   onDragOver={(e) => handleDragOver(e, index())}
@@ -333,36 +345,47 @@ const ItemList: Component = () => {
       </div>
 
       {/* ドラッグ中のゴースト要素 */}
-      <Show when={draggedIndex() !== null && dragPosition() && containerWidth() > 0}>
-        <Portal>
-          <div
-            class="pointer-events-none fixed z-50"
-            style={{
-              left: `${containerLeft()}px`,
-              top: `${dragPosition()!.y}px`,
-              width: `${containerWidth()}px`,
-              transform: "translateY(-50%)",
-              "box-shadow":
-                "0 -8px 15px -3px rgba(0, 0, 0, 0.06), 0 8px 15px -3px rgba(0, 0, 0, 0.06), 0 -2px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 6px -1px rgba(0, 0, 0, 0.03)",
-            }}
-          >
-            <div class="opacity-90">
-              <ItemCard
-                item={filteredAndSortedItems()[draggedIndex()!]}
-                index={draggedIndex()!}
-                isDragging={false}
-                isDragOver={false}
-                onDragStart={() => {}}
-                onDragOver={() => {}}
-                onDragEnd={() => {}}
-                onDragLeave={() => {}}
-                onHandleTouchStart={() => {}}
-                onHandleTouchMove={() => {}}
-                onHandleTouchEnd={() => {}}
-              />
-            </div>
-          </div>
-        </Portal>
+      <Show when={draggedId() !== null && dragPosition() && containerWidth() > 0}>
+        {(() => {
+          const items = filteredAndSortedItems();
+          const dragId = draggedId();
+          const draggedItem = items.find((item) => item.id === dragId);
+          const dragIdx = items.findIndex((item) => item.id === dragId);
+
+          if (!draggedItem || dragIdx === -1) return null;
+
+          return (
+            <Portal>
+              <div
+                class="pointer-events-none fixed z-50"
+                style={{
+                  left: `${containerLeft()}px`,
+                  top: `${dragPosition()!.y}px`,
+                  width: `${containerWidth()}px`,
+                  transform: "translateY(-50%)",
+                  "box-shadow":
+                    "0 -8px 15px -3px rgba(0, 0, 0, 0.06), 0 8px 15px -3px rgba(0, 0, 0, 0.06), 0 -2px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 6px -1px rgba(0, 0, 0, 0.03)",
+                }}
+              >
+                <div class="opacity-90">
+                  <ItemCard
+                    item={draggedItem}
+                    index={dragIdx}
+                    isDragging={false}
+                    isDragOver={false}
+                    onDragStart={() => {}}
+                    onDragOver={() => {}}
+                    onDragEnd={() => {}}
+                    onDragLeave={() => {}}
+                    onHandleTouchStart={() => {}}
+                    onHandleTouchMove={() => {}}
+                    onHandleTouchEnd={() => {}}
+                  />
+                </div>
+              </div>
+            </Portal>
+          );
+        })()}
       </Show>
     </>
   );
