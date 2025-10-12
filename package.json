@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "browser-image-compression": "^2.0.2",
+    "clsx": "^2.1.1",
     "cropperjs": "^1.6.2",
     "idb": "^8.0.3",
     "lucide-solid": "^0.545.0",
