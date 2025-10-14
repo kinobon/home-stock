@@ -1,5 +1,13 @@
 export type ItemID = string; // nanoid()
 export type Timestamp = number; // Date.now()
+export type TagID = string; // nanoid()
+
+export interface Tag {
+  id: TagID;
+  name: string;
+  color: string;
+  createdAt: Timestamp;
+}
 
 export interface Item {
   id: ItemID;
@@ -7,6 +15,7 @@ export interface Item {
   quantity: number;
   photo?: string;
   memo?: string;
+  tagIds?: TagID[]; // タグID配列
   createdAt: Timestamp;
   updatedAt: Timestamp;
   order?: number; // 並び順
@@ -25,10 +34,11 @@ export interface Log {
 export interface AppState {
   items: Item[];
   logs: Log[];
+  tags: Tag[];
   searchQuery: string;
   selectedItemId?: ItemID;
   view: "list" | "editor" | "counter";
-  currentTab: "items" | "history" | "settings";
+  currentTab: "items" | "history" | "settings" | "other";
 }
 
 export interface ExportData {
@@ -36,4 +46,5 @@ export interface ExportData {
   exportedAt: Timestamp;
   items: Item[];
   logs: Log[];
+  tags: Tag[];
 }

@@ -1,5 +1,5 @@
-import type { Component } from "solid-js";
-import { setSelectedItem, setView, incrementQuantity, decrementQuantity } from "../state/store";
+import { For, Show, type Component } from "solid-js";
+import { state, setSelectedItem, setView, incrementQuantity, decrementQuantity } from "../state/store";
 import type { Item } from "../types";
 import { GripVertical, Minus, Plus } from "lucide-solid";
 import clsx from "clsx";
@@ -70,6 +70,25 @@ const ItemCard: Component<ItemCardProps> = (props) => {
         class="flex-1 text-left transition-colors hover:text-blue-600 active:text-blue-700"
       >
         <h3 class="text-base font-medium text-gray-900">{props.item.name}</h3>
+        <Show when={props.item.tagIds && props.item.tagIds.length > 0}>
+          <div class="mt-0.5 flex flex-wrap gap-1">
+            <For each={props.item.tagIds}>
+              {(tagId) => {
+                const tag = state.tags.find((t) => t.id === tagId);
+                return (
+                  <Show when={tag}>
+                    <span
+                      class="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-xs font-medium text-white"
+                      style={{ "background-color": tag!.color }}
+                    >
+                      {tag!.name}
+                    </span>
+                  </Show>
+                );
+              }}
+            </For>
+          </div>
+        </Show>
       </button>
 
       {/* 数量コントロールと差分表示 */}

@@ -8,7 +8,7 @@ import {
   setView,
 } from "../state/store";
 import ItemCard from "./ItemCard";
-import { Package, Plus, Settings as SettingsIcon, Search, X, Clock } from "lucide-solid";
+import { Package, Plus, MoreHorizontal, Search, X, Clock } from "lucide-solid";
 import { useUIState } from "../context/UIStateContext";
 
 const ItemList: Component = () => {
@@ -70,10 +70,10 @@ const ItemList: Component = () => {
             onClick: () => setCurrentTab("history"),
           },
           {
-            key: "settings",
-            label: "設定",
-            icon: <SettingsIcon size={24} />,
-            onClick: () => setCurrentTab("settings"),
+            key: "other",
+            label: "その他",
+            icon: <MoreHorizontal size={24} />,
+            onClick: () => setCurrentTab("other"),
           },
         ],
       });
