@@ -3,10 +3,17 @@ import { Download, Upload, Trash2, Settings as SettingsIcon, Package, Clock } fr
 import { exportData, importData, clearAll, setCurrentTab } from "../state/store";
 import { useUIState } from "../context/UIStateContext";
 
-const Settings: Component = () => {
+interface SettingsProps {
+  isSubView?: boolean;
+}
+
+const Settings: Component<SettingsProps> = (props) => {
   const [, { setHeader, setBottomNav, setFab }] = useUIState();
 
   onMount(() => {
+    // サブビューとして使われる場合はUIステートを設定しない
+    if (props.isSubView) return;
+
     batch(() => {
       // UIステートの設定
       setHeader({
@@ -119,7 +126,7 @@ const Settings: Component = () => {
   };
 
   return (
-    <div class="mx-auto max-w-4xl px-4 py-6">
+    <div class={props.isSubView ? "space-y-4" : "mx-auto max-w-4xl px-4 py-6"}>
       <div class="space-y-4">
         {/* データバックアップ */}
         <section class="rounded-lg border border-gray-200 bg-white">

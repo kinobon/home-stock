@@ -1,6 +1,6 @@
 import { createStore } from "solid-js/store";
 import { nanoid } from "nanoid";
-import type { Item, AppState, Log } from "../types";
+import type { Item, AppState, Log, Tag } from "../types";
 import {
   getAllItems,
   saveItem,
@@ -9,11 +9,16 @@ import {
   getAllLogs,
   saveLog,
   clearAllLogs,
+  getAllTags,
+  saveTag,
+  deleteTag,
+  clearAllTags,
 } from "./db";
 
 const initialState: AppState = {
   items: [],
   logs: [],
+  tags: [],
   searchQuery: "",
   selectedItemId: undefined,
   view: "list",
@@ -26,6 +31,7 @@ export const [state, setState] = createStore<AppState>(initialState);
 export async function initializeStore() {
   const items = await getAllItems();
   const logs = await getAllLogs();
+  const tags = await getAllTags();
 
   // 既存データのマイグレーション: confirmedValueを削除
   const migratedItems = items.map((item) => {
@@ -43,10 +49,17 @@ export async function initializeStore() {
 
   setState("items", migratedItems);
   setState("logs", logs);
+  setState("tags", tags);
 }
 
 // アイテム作成
-export async function createItem(name: string, quantity: number, photo?: string, memo?: string) {
+export async function createItem(
+  name: string,
+  quantity: number,
+  photo?: string,
+  memo?: string,
+  tagIds?: string[]
+) {
   const now = Date.now();
 
   // 現在の最大order値を取得
@@ -60,6 +73,7 @@ export async function createItem(name: string, quantity: number, photo?: string,
     quantity,
     photo,
     memo,
+    tagIds,
     createdAt: now,
     updatedAt: now,
     order: maxOrder + 1, // 最後に追加
@@ -206,8 +220,53 @@ export async function removeItem(id: string) {
 export async function clearAll() {
   await clearAllItems();
   await clearAllLogs();
+  await clearAllTags();
   setState("items", []);
   setState("logs", []);
+  setState("tags", []);
+}
+
+// タグ管理
+export async function createTag(name: string, color: string) {
+  const now = Date.now();
+  const newTag: Tag = {
+    id: nanoid(),
+    name,
+    color,
+    createdAt: now,
+  };
+
+  await saveTag(newTag);
+  setState("tags", (tags) => [...tags, newTag].sort((a, b) => a.name.localeCompare(b.name)));
+  return newTag;
+}
+
+export async function updateTag(id: string, name: string, color: string) {
+  const index = state.tags.findIndex((tag) => tag.id === id);
+  if (index === -1) return;
+
+  const updatedTag: Tag = {
+    ...state.tags[index],
+    name,
+    color,
+  };
+
+  await saveTag(updatedTag);
+  setState("tags", (tags) =>
+    tags.map((tag) => (tag.id === id ? updatedTag : tag)).sort((a, b) => a.name.localeCompare(b.name))
+  );
+}
+
+export async function removeTag(id: string) {
+  await deleteTag(id);
+  setState("tags", (tags) => tags.filter((tag) => tag.id !== id));
+
+  // タグが削除された場合、そのタグを持つアイテムからタグIDを削除
+  const itemsWithTag = state.items.filter((item) => item.tagIds?.includes(id));
+  for (const item of itemsWithTag) {
+    const updatedTagIds = item.tagIds?.filter((tagId) => tagId !== id);
+    await updateItem(item.id, { tagIds: updatedTagIds });
+  }
 }
 
 // UI State
@@ -236,17 +295,18 @@ export function setView(view: "list" | "editor" | "counter") {
   setState("view", view);
 }
 
-export function setCurrentTab(tab: "items" | "history" | "settings") {
+export function setCurrentTab(tab: "items" | "history" | "settings" | "other") {
   setState("currentTab", tab);
 }
 
 // エクスポート/インポート
 export function exportData(): string {
   const exportData = {
-    version: "3.0.0", // confirmedValue削除のため3.0.0に
+    version: "4.0.0", // タグ追加のため4.0.0に
     exportedAt: Date.now(),
     items: state.items,
     logs: state.logs,
+    tags: state.tags,
   };
   return JSON.stringify(exportData, null, 2);
 }
@@ -288,9 +348,17 @@ export async function importData(jsonString: string) {
       }
     }
 
+    // タグのバリデーション（タグがある場合）
+    if (data.tags !== undefined) {
+      if (!Array.isArray(data.tags)) {
+        throw new Error("tags は配列である必要があります");
+      }
+    }
+
     // データベースをクリアしてインポート
     await clearAllItems();
     await clearAllLogs();
+    await clearAllTags();
 
     // アイテムをインポート
     for (const item of data.items) {
@@ -308,6 +376,16 @@ export async function importData(jsonString: string) {
       setState("logs", data.logs);
     } else {
       setState("logs", []);
+    }
+
+    // タグをインポート
+    if (data.tags && Array.isArray(data.tags)) {
+      for (const tag of data.tags) {
+        await saveTag(tag);
+      }
+      setState("tags", data.tags);
+    } else {
+      setState("tags", []);
     }
 
     // ステートを更新

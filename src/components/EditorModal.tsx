@@ -8,10 +8,11 @@ import {
   removeItem,
 } from "../state/store";
 import { compressImage } from "../utils/image";
-import { X, Save, Image as ImageIcon, Loader2, Trash2 } from "lucide-solid";
+import { X, Save, Image as ImageIcon, Loader2, Trash2, Tag as TagIcon } from "lucide-solid";
 import QuantitySpinner from "./QuantitySpinner";
 import ImageCropper from "./ImageCropper";
 import FullScreenModal from "./FullScreenModal";
+import TagSelector from "./TagSelector";
 
 const EditorModal: Component = () => {
   const currentItem = () => state.items.find((item) => item.id === state.selectedItemId);
@@ -20,6 +21,7 @@ const EditorModal: Component = () => {
   const [quantity, setQuantity] = createSignal(0);
   const [memo, setMemo] = createSignal("");
   const [photo, setPhoto] = createSignal("");
+  const [selectedTagIds, setSelectedTagIds] = createSignal<string[]>([]);
   const [isProcessing, setIsProcessing] = createSignal(false);
   const [showCropper, setShowCropper] = createSignal(false);
   const [tempImageUrl, setTempImageUrl] = createSignal("");
@@ -34,11 +36,13 @@ const EditorModal: Component = () => {
           setQuantity(item.quantity);
           setMemo(item.memo || "");
           setPhoto(item.photo || "");
+          setSelectedTagIds(item.tagIds || []);
         } else {
           setName("");
           setQuantity(0);
           setMemo("");
           setPhoto("");
+          setSelectedTagIds([]);
         }
       });
     }
@@ -98,9 +102,16 @@ const EditorModal: Component = () => {
           quantity: quantity(),
           memo: memo() || undefined,
           photo: photo() || undefined,
+          tagIds: selectedTagIds().length > 0 ? selectedTagIds() : undefined,
         });
       } else {
-        await createItem(name(), quantity(), photo() || undefined, memo() || undefined);
+        await createItem(
+          name(),
+          quantity(),
+          photo() || undefined,
+          memo() || undefined,
+          selectedTagIds().length > 0 ? selectedTagIds() : undefined
+        );
       }
       handleClose();
     } catch (error) {
@@ -197,6 +208,22 @@ const EditorModal: Component = () => {
                 class="w-full rounded-lg border-2 border-gray-300 bg-gray-50 px-4 py-3 text-base transition-all focus:border-blue-500 focus:bg-white focus:outline-none md:py-2.5 md:text-sm"
                 rows="3"
                 placeholder="補足情報など"
+              />
+            </div>
+
+            {/* タグ */}
+            <div>
+              <label class="mb-2 flex items-center gap-1 text-sm font-medium text-gray-700">
+                <TagIcon size={16} />
+                タグ
+              </label>
+              <TagSelector
+                selectedTagIds={selectedTagIds()}
+                onToggleTag={(tagId) => {
+                  setSelectedTagIds((prev) =>
+                    prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
+                  );
+                }}
               />
             </div>
 

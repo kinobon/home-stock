@@ -7,6 +7,7 @@ import EditorModal from "./components/EditorModal";
 import HistoryScreen from "./components/HistoryScreen";
 import BottomNav from "./components/BottomNav";
 import Settings from "./components/Settings";
+import Other from "./components/Other";
 import FAB from "./components/FAB";
 import { useIOSScrollDebounce, optimizeTouchEvents } from "./utils/scroll";
 import { tabTransition } from "./utils/transition";
@@ -20,7 +21,8 @@ const App: Component = () => {
   const getTabIndex = (tab: string) => {
     if (tab === "items") return 0;
     if (tab === "history") return 1;
-    return 2; // settings
+    if (tab === "settings") return 2;
+    return 3; // other
   };
 
   // タブ変更を検知してインデックスを更新
@@ -70,6 +72,9 @@ const App: Component = () => {
           </Show>
           <Show when={state.currentTab === "settings"}>
             <Settings />
+          </Show>
+          <Show when={state.currentTab === "other"}>
+            <Other />
           </Show>
         </div>
 

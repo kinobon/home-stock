@@ -1,6 +1,6 @@
 import { For, onMount, batch, createMemo, type Component } from "solid-js";
 import { state, setCurrentTab } from "../state/store";
-import { Package, Settings as SettingsIcon, Clock } from "lucide-solid";
+import { Package, MoreHorizontal, Clock } from "lucide-solid";
 import { useUIState } from "../context/UIStateContext";
 
 const HistoryScreen: Component = () => {
@@ -56,10 +56,10 @@ const HistoryScreen: Component = () => {
             },
           },
           {
-            key: "settings",
-            label: "設定",
-            icon: <SettingsIcon size={24} />,
-            onClick: () => setCurrentTab("settings"),
+            key: "other",
+            label: "その他",
+            icon: <MoreHorizontal size={24} />,
+            onClick: () => setCurrentTab("other"),
           },
         ],
       });
