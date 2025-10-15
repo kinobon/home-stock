@@ -1,6 +1,6 @@
 import { createStore } from "solid-js/store";
 import { nanoid } from "nanoid";
-import type { Item, AppState, Log, Tag } from "../types";
+import type { Item, AppState, Log, Tag, SortField, SortOrder } from "../types";
 import {
   getAllItems,
   saveItem,
@@ -20,6 +20,8 @@ const initialState: AppState = {
   tags: [],
   logs: [],
   searchQuery: "",
+  sortField: "name",
+  sortOrder: "asc",
   selectedItemId: undefined,
   view: "list",
   currentTab: "items",
@@ -83,11 +85,6 @@ export async function createItem(
   const now = Date.now();
   const validTagIds = sanitizeTagIds(tagIds);
 
-  // 現在の最大order値を取得
-  const maxOrder = state.items.reduce((max, item) => {
-    return Math.max(max, item.order ?? 0);
-  }, -1);
-
   const newItem: Item = {
     id: nanoid(),
     name,
@@ -97,7 +94,6 @@ export async function createItem(
     tagIds: validTagIds,
     createdAt: now,
     updatedAt: now,
-    order: maxOrder + 1, // 最後に追加
   };
 
   await saveItem(newItem);
@@ -328,17 +324,12 @@ export function setSearchQuery(query: string) {
   setState("searchQuery", query);
 }
 
-export function reorderItems(newOrder: string[]) {
-  // 新しい順序でアイテムを並び替え
-  const itemsMap = new Map(state.items.map((item) => [item.id, item]));
-  const reorderedItems = newOrder
-    .map((id) => itemsMap.get(id))
-    .filter((item): item is Item => item !== undefined)
-    .map((item, index) => ({ ...item, order: index, updatedAt: Date.now() }));
+export function setSortField(field: SortField) {
+  setState("sortField", field);
+}
 
-  // IndexedDBに保存
-  reorderedItems.forEach((item) => saveItem(item));
-  setState("items", reorderedItems);
+export function setSortOrder(order: SortOrder) {
+  setState("sortOrder", order);
 }
 
 export function setSelectedItem(id?: string) {

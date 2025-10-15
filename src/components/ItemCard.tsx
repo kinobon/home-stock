@@ -7,22 +7,10 @@ import {
   decrementQuantity,
 } from "../state/store";
 import type { Item } from "../types";
-import { GripVertical, Minus, Plus } from "lucide-solid";
-import clsx from "clsx";
+import { Minus, Plus } from "lucide-solid";
 
 interface ItemCardProps {
   item: Item;
-  index: number;
-  isDragging: boolean;
-  dragClass?: string;
-  isDragOver: boolean;
-  onDragStart: () => void;
-  onDragOver: (e: DragEvent) => void;
-  onDragEnd: () => void;
-  onDragLeave: () => void;
-  onHandleTouchStart: (e: TouchEvent) => void;
-  onHandleTouchMove: (e: TouchEvent) => void;
-  onHandleTouchEnd: () => void;
 }
 
 const ItemCard: Component<ItemCardProps> = (props) => {
@@ -49,18 +37,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
   };
 
   return (
-    <div
-      data-item-index={props.index}
-      draggable={true}
-      onDragStart={props.onDragStart}
-      onDragOver={props.onDragOver}
-      onDragEnd={props.onDragEnd}
-      onDragLeave={props.onDragLeave}
-      class={clsx(
-        "flex h-14 w-full items-center gap-1 border-b border-gray-200 bg-white transition-all [&>*]:h-full",
-        props.isDragging && "-translate-y-1 transform opacity-50 shadow-lg"
-      )}
-    >
+    <div class="flex min-h-[3.5rem] w-full items-center gap-2 border-b border-gray-200 bg-white px-1">
       {/* サムネイル画像 */}
       <button
         onClick={openItemEditor}
@@ -127,16 +104,6 @@ const ItemCard: Component<ItemCardProps> = (props) => {
         >
           <Plus size={16} />
         </button>
-      </div>
-
-      {/* ドラッグハンドル（常に表示） */}
-      <div
-        class="flex h-full cursor-grab touch-none items-center px-3 text-gray-400 active:cursor-grabbing"
-        onTouchStart={props.onHandleTouchStart}
-        onTouchMove={props.onHandleTouchMove}
-        onTouchEnd={props.onHandleTouchEnd}
-      >
-        <GripVertical size={20} />
       </div>
     </div>
   );

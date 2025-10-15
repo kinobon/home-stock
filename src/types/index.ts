@@ -13,6 +13,9 @@ export interface Item {
   order?: number; // 並び順
 }
 
+export type SortField = "name" | "quantity";
+export type SortOrder = "asc" | "desc";
+
 export interface Tag {
   id: string;
   name: string;
@@ -35,6 +38,8 @@ export interface AppState {
   tags: Tag[];
   logs: Log[];
   searchQuery: string;
+  sortField: SortField;
+  sortOrder: SortOrder;
   selectedItemId?: ItemID;
   view: "list" | "editor" | "counter";
   currentTab: "items" | "history" | "settings";
