@@ -124,10 +124,16 @@ const ItemList: Component = () => {
     // 検索フィルター
     if (state.searchQuery.trim()) {
       const query = state.searchQuery.toLowerCase();
-      items = items.filter(
-        (item) =>
-          item.name.toLowerCase().includes(query) || item.memo?.toLowerCase().includes(query)
-      );
+      const tagNameMap = new Map(state.tags.map((tag) => [tag.id, tag.name.toLowerCase()]));
+      items = items.filter((item) => {
+        const nameMatch = item.name.toLowerCase().includes(query);
+        const memoMatch = item.memo?.toLowerCase().includes(query) ?? false;
+        const tagMatch = (item.tagIds ?? []).some((tagId) => {
+          const tagName = tagNameMap.get(tagId);
+          return tagName ? tagName.includes(query) : false;
+        });
+        return nameMatch || memoMatch || tagMatch;
+      });
     }
 
     // 常にカスタム並び順を使用

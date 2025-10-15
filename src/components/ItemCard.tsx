@@ -1,5 +1,11 @@
-import type { Component } from "solid-js";
-import { setSelectedItem, setView, incrementQuantity, decrementQuantity } from "../state/store";
+import { For, Show, createMemo, type Component } from "solid-js";
+import {
+  state,
+  setSelectedItem,
+  setView,
+  incrementQuantity,
+  decrementQuantity,
+} from "../state/store";
 import type { Item } from "../types";
 import { GripVertical, Minus, Plus } from "lucide-solid";
 import clsx from "clsx";
@@ -24,6 +30,13 @@ const ItemCard: Component<ItemCardProps> = (props) => {
     setSelectedItem(props.item.id);
     setView("editor");
   };
+
+  const tagNames = createMemo(() => {
+    const tagMap = new Map(state.tags.map((tag) => [tag.id, tag.name]));
+    return (props.item.tagIds ?? [])
+      .map((tagId) => tagMap.get(tagId))
+      .filter((name): name is string => typeof name === "string");
+  });
 
   const handleIncrement = (e: MouseEvent) => {
     e.stopPropagation();
@@ -69,7 +82,20 @@ const ItemCard: Component<ItemCardProps> = (props) => {
         onClick={openItemEditor}
         class="flex-1 text-left transition-colors hover:text-blue-600 active:text-blue-700"
       >
-        <h3 class="text-base font-medium text-gray-900">{props.item.name}</h3>
+        <div class="flex flex-col">
+          <h3 class="text-base font-medium text-gray-900">{props.item.name}</h3>
+          <Show when={tagNames().length > 0}>
+            <div class="mt-1 flex flex-wrap gap-1">
+              <For each={tagNames()}>
+                {(name) => (
+                  <span class="rounded-full bg-blue-50 px-2 py-0.5 text-[0.65rem] font-medium text-blue-600">
+                    {name}
+                  </span>
+                )}
+              </For>
+            </div>
+          </Show>
+        </div>
       </button>
 
       {/* 数量コントロールと差分表示 */}

@@ -1,6 +1,6 @@
 import { openDB } from "idb";
 import type { DBSchema, IDBPDatabase } from "idb";
-import type { Item, Log } from "../types";
+import type { Item, Log, Tag } from "../types";
 
 interface HomeStockDB extends DBSchema {
   items: {
@@ -20,10 +20,17 @@ interface HomeStockDB extends DBSchema {
       "by-itemId": string;
     };
   };
+  tags: {
+    key: string;
+    value: Tag;
+    indexes: {
+      "by-name": string;
+    };
+  };
 }
 
 const DB_NAME = "home-stock-db";
-const DB_VERSION = 2; // ログテーブル追加のためバージョンアップ
+const DB_VERSION = 3; // タグテーブル追加のためバージョンアップ
 
 let dbInstance: IDBPDatabase<HomeStockDB> | null = null;
 
@@ -45,6 +52,12 @@ async function getDB(): Promise<IDBPDatabase<HomeStockDB>> {
         const logStore = db.createObjectStore("logs", { keyPath: "id" });
         logStore.createIndex("by-timestamp", "timestamp");
         logStore.createIndex("by-itemId", "itemId");
+      }
+
+      // バージョン3: tagsストア作成
+      if (oldVersion < 3) {
+        const tagStore = db.createObjectStore("tags", { keyPath: "id" });
+        tagStore.createIndex("by-name", "name", { unique: false });
       }
     },
   });
@@ -100,4 +113,25 @@ export async function saveLogs(logs: Log[]): Promise<void> {
 export async function clearAllLogs(): Promise<void> {
   const db = await getDB();
   await db.clear("logs");
+}
+
+// タグ関連の関数
+export async function getAllTags(): Promise<Tag[]> {
+  const db = await getDB();
+  return db.getAll("tags");
+}
+
+export async function saveTag(tag: Tag): Promise<void> {
+  const db = await getDB();
+  await db.put("tags", tag);
+}
+
+export async function deleteTag(id: string): Promise<void> {
+  const db = await getDB();
+  await db.delete("tags", id);
+}
+
+export async function clearAllTags(): Promise<void> {
+  const db = await getDB();
+  await db.clear("tags");
 }

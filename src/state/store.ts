@@ -1,6 +1,6 @@
 import { createStore } from "solid-js/store";
 import { nanoid } from "nanoid";
-import type { Item, AppState, Log } from "../types";
+import type { Item, AppState, Log, Tag } from "../types";
 import {
   getAllItems,
   saveItem,
@@ -9,10 +9,15 @@ import {
   getAllLogs,
   saveLog,
   clearAllLogs,
+  getAllTags,
+  saveTag,
+  deleteTag as deleteTagFromDB,
+  clearAllTags,
 } from "./db";
 
 const initialState: AppState = {
   items: [],
+  tags: [],
   logs: [],
   searchQuery: "",
   selectedItemId: undefined,
@@ -22,32 +27,61 @@ const initialState: AppState = {
 
 export const [state, setState] = createStore<AppState>(initialState);
 
+function sanitizeTagIds(tagIds?: string[]): string[] {
+  if (!Array.isArray(tagIds)) return [];
+  const validIds = new Set(state.tags.map((tag) => tag.id));
+  const unique: string[] = [];
+  for (const id of tagIds) {
+    if (typeof id !== "string") continue;
+    if (!validIds.has(id)) continue;
+    if (unique.includes(id)) continue;
+    unique.push(id);
+  }
+  return unique;
+}
+
 // 初期化: IndexedDB からデータをロード
 export async function initializeStore() {
   const items = await getAllItems();
   const logs = await getAllLogs();
+  const tags = await getAllTags();
 
   // 既存データのマイグレーション: confirmedValueを削除
   const migratedItems = items.map((item) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { confirmedValue, ...rest } = item as Item & { confirmedValue?: number };
-    return rest as Item;
+    const { confirmedValue, tagIds, ...rest } = item as Item & {
+      confirmedValue?: number;
+      tagIds?: string[];
+    };
+    return {
+      ...rest,
+      tagIds: Array.isArray(tagIds) ? tagIds : [],
+    } as Item;
   });
 
   // マイグレーションが必要な場合は保存
   for (let i = 0; i < items.length; i++) {
-    if ("confirmedValue" in items[i]) {
+    const originalItem = items[i] as Item & { confirmedValue?: number; tagIds?: string[] };
+    if ("confirmedValue" in originalItem || !Array.isArray(originalItem.tagIds)) {
       await saveItem(migratedItems[i]);
     }
   }
 
   setState("items", migratedItems);
+  setState("tags", tags);
   setState("logs", logs);
 }
 
 // アイテム作成
-export async function createItem(name: string, quantity: number, photo?: string, memo?: string) {
+export async function createItem(
+  name: string,
+  quantity: number,
+  photo?: string,
+  memo?: string,
+  tagIds?: string[]
+) {
   const now = Date.now();
+  const validTagIds = sanitizeTagIds(tagIds);
 
   // 現在の最大order値を取得
   const maxOrder = state.items.reduce((max, item) => {
@@ -60,6 +94,7 @@ export async function createItem(name: string, quantity: number, photo?: string,
     quantity,
     photo,
     memo,
+    tagIds: validTagIds,
     createdAt: now,
     updatedAt: now,
     order: maxOrder + 1, // 最後に追加
@@ -90,9 +125,22 @@ export async function updateItem(
   const oldName = oldItem.name;
   const oldId = oldItem.id;
 
+  const sanitizedUpdates: Partial<Omit<Item, "id" | "createdAt" | "updatedAt">> = {
+    ...updates,
+  };
+  if (updates.tagIds !== undefined) {
+    sanitizedUpdates.tagIds = sanitizeTagIds(updates.tagIds);
+  }
+
   const updatedItem: Item = {
     ...oldItem,
-    ...updates,
+    ...sanitizedUpdates,
+    tagIds:
+      sanitizedUpdates.tagIds !== undefined
+        ? sanitizedUpdates.tagIds
+        : Array.isArray(oldItem.tagIds)
+          ? [...oldItem.tagIds]
+          : [],
     updatedAt: Date.now(),
   };
 
@@ -103,6 +151,69 @@ export async function updateItem(
   if (updates.quantity !== undefined && updates.quantity !== oldQuantity) {
     await addOrUpdateLog(oldId, oldName, oldQuantity, updates.quantity);
   }
+}
+
+export async function createTag(name: string) {
+  const trimmed = name.trim();
+  if (!trimmed) {
+    throw new Error("タグ名を入力してください");
+  }
+
+  const now = Date.now();
+  const newTag: Tag = {
+    id: nanoid(),
+    name: trimmed,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  await saveTag(newTag);
+  setState("tags", (tags) => [...tags, newTag]);
+  return newTag;
+}
+
+export async function updateTag(id: string, name: string) {
+  const index = state.tags.findIndex((tag) => tag.id === id);
+  if (index === -1) return;
+
+  const trimmed = name.trim();
+  if (!trimmed) {
+    throw new Error("タグ名を入力してください");
+  }
+
+  const oldTag = state.tags[index];
+  const updatedTag: Tag = {
+    ...oldTag,
+    name: trimmed,
+    updatedAt: Date.now(),
+  };
+
+  await saveTag(updatedTag);
+  setState("tags", index, updatedTag);
+}
+
+export async function removeTag(id: string) {
+  await deleteTagFromDB(id);
+  setState("tags", (tags) => tags.filter((tag) => tag.id !== id));
+
+  const itemsUsingTag = state.items.filter((item) => item.tagIds?.includes(id));
+  if (itemsUsingTag.length === 0) {
+    return;
+  }
+
+  const updatedItems = itemsUsingTag.map((item) => {
+    const nextTagIds = (item.tagIds ?? []).filter((tagId) => tagId !== id);
+    return {
+      ...item,
+      tagIds: nextTagIds,
+      updatedAt: Date.now(),
+    };
+  });
+
+  await Promise.all(updatedItems.map((item) => saveItem(item)));
+
+  const updatedMap = new Map(updatedItems.map((item) => [item.id, item] as const));
+  setState("items", (items) => items.map((item) => updatedMap.get(item.id) ?? item));
 }
 
 // ログの追加または更新（同じ日・同じアイテムは統合）
@@ -206,7 +317,9 @@ export async function removeItem(id: string) {
 export async function clearAll() {
   await clearAllItems();
   await clearAllLogs();
+  await clearAllTags();
   setState("items", []);
+  setState("tags", []);
   setState("logs", []);
 }
 
@@ -243,9 +356,13 @@ export function setCurrentTab(tab: "items" | "history" | "settings") {
 // エクスポート/インポート
 export function exportData(): string {
   const exportData = {
-    version: "3.0.0", // confirmedValue削除のため3.0.0に
+    version: "4.0.0", // タグ対応のため4.0.0に
     exportedAt: Date.now(),
-    items: state.items,
+    items: state.items.map((item) => ({
+      ...item,
+      tagIds: Array.isArray(item.tagIds) ? item.tagIds : [],
+    })),
+    tags: state.tags,
     logs: state.logs,
   };
   return JSON.stringify(exportData, null, 2);
@@ -288,16 +405,67 @@ export async function importData(jsonString: string) {
       }
     }
 
+    // タグのバリデーション
+    if (data.tags !== undefined) {
+      if (!Array.isArray(data.tags)) {
+        throw new Error("tags は配列である必要があります");
+      }
+    }
+
+    const importedTagsMap = new Map<string, Tag>();
+    if (Array.isArray(data.tags)) {
+      for (const rawTag of data.tags as Tag[]) {
+        if (!rawTag.id || typeof rawTag.id !== "string") {
+          throw new Error("タグに有効な id がありません");
+        }
+        if (!rawTag.name || typeof rawTag.name !== "string") {
+          throw new Error("タグに有効な name がありません");
+        }
+        const now = Date.now();
+        const cleanedTag: Tag = {
+          id: rawTag.id,
+          name: rawTag.name,
+          createdAt: typeof rawTag.createdAt === "number" ? rawTag.createdAt : now,
+          updatedAt: typeof rawTag.updatedAt === "number" ? rawTag.updatedAt : now,
+        };
+        importedTagsMap.set(cleanedTag.id, cleanedTag);
+      }
+    }
+
+    const importedTags = Array.from(importedTagsMap.values());
+    const validTagIds = new Set(importedTagsMap.keys());
+
+    const importedItems = data.items.map((item: Item & { confirmedValue?: number }) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { confirmedValue, ...rest } = item;
+      const sanitizedTagIds: string[] = [];
+      if (Array.isArray(item.tagIds)) {
+        for (const tagId of item.tagIds) {
+          if (typeof tagId !== "string") continue;
+          if (!validTagIds.has(tagId)) continue;
+          if (sanitizedTagIds.includes(tagId)) continue;
+          sanitizedTagIds.push(tagId);
+        }
+      }
+      return {
+        ...rest,
+        tagIds: sanitizedTagIds,
+      };
+    });
+
     // データベースをクリアしてインポート
     await clearAllItems();
     await clearAllLogs();
+    await clearAllTags();
+
+    // タグをインポート
+    for (const tag of importedTags) {
+      await saveTag(tag);
+    }
 
     // アイテムをインポート
-    for (const item of data.items) {
-      // confirmedValueがある場合は削除（旧バージョンとの互換性）
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { confirmedValue, ...cleanItem } = item as Item & { confirmedValue?: number };
-      await saveItem(cleanItem);
+    for (const item of importedItems) {
+      await saveItem(item);
     }
 
     // ログをインポート
@@ -311,14 +479,8 @@ export async function importData(jsonString: string) {
     }
 
     // ステートを更新
-    setState(
-      "items",
-      data.items.map((item: Item & { confirmedValue?: number }) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { confirmedValue, ...cleanItem } = item;
-        return cleanItem;
-      })
-    );
+    setState("tags", importedTags);
+    setState("items", importedItems);
   } catch (error) {
     console.error("Import failed:", error);
     if (error instanceof SyntaxError) {

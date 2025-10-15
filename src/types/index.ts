@@ -7,9 +7,17 @@ export interface Item {
   quantity: number;
   photo?: string;
   memo?: string;
+  tagIds?: string[];
   createdAt: Timestamp;
   updatedAt: Timestamp;
   order?: number; // 並び順
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }
 
 export interface Log {
@@ -24,6 +32,7 @@ export interface Log {
 
 export interface AppState {
   items: Item[];
+  tags: Tag[];
   logs: Log[];
   searchQuery: string;
   selectedItemId?: ItemID;
@@ -35,5 +44,6 @@ export interface ExportData {
   version: string;
   exportedAt: Timestamp;
   items: Item[];
+  tags: Tag[];
   logs: Log[];
 }

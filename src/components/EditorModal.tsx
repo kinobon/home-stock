@@ -1,4 +1,4 @@
-import { createSignal, createEffect, batch, Show, type Component } from "solid-js";
+import { createSignal, createEffect, createMemo, batch, Show, For, type Component } from "solid-js";
 import {
   state,
   setView,
@@ -6,6 +6,7 @@ import {
   updateItem,
   setSelectedItem,
   removeItem,
+  createTag,
 } from "../state/store";
 import { compressImage } from "../utils/image";
 import { X, Save, Image as ImageIcon, Loader2, Trash2 } from "lucide-solid";
@@ -23,6 +24,13 @@ const EditorModal: Component = () => {
   const [isProcessing, setIsProcessing] = createSignal(false);
   const [showCropper, setShowCropper] = createSignal(false);
   const [tempImageUrl, setTempImageUrl] = createSignal("");
+  const [selectedTagIds, setSelectedTagIds] = createSignal<string[]>([]);
+  const [newTagName, setNewTagName] = createSignal("");
+  const [isSavingTag, setIsSavingTag] = createSignal(false);
+
+  const sortedTags = createMemo(() =>
+    [...state.tags].sort((a, b) => a.name.localeCompare(b.name, "ja"))
+  );
 
   // モーダルが開かれたときに currentItem の値を反映
   createEffect(() => {
@@ -34,15 +42,67 @@ const EditorModal: Component = () => {
           setQuantity(item.quantity);
           setMemo(item.memo || "");
           setPhoto(item.photo || "");
+          setSelectedTagIds(
+            Array.isArray(item.tagIds)
+              ? item.tagIds.filter((id) => state.tags.some((tag) => tag.id === id))
+              : []
+          );
         } else {
           setName("");
           setQuantity(0);
           setMemo("");
           setPhoto("");
+          setSelectedTagIds([]);
         }
+        setNewTagName("");
       });
     }
   });
+
+  createEffect(() => {
+    const availableIds = new Set(state.tags.map((tag) => tag.id));
+    setSelectedTagIds((current) => {
+      const filtered = current.filter((id) => availableIds.has(id));
+      return filtered.length === current.length ? current : filtered;
+    });
+  });
+
+  const toggleTag = (tagId: string) => {
+    setSelectedTagIds((current) => {
+      if (current.includes(tagId)) {
+        return current.filter((id) => id !== tagId);
+      }
+      return [...current, tagId];
+    });
+  };
+
+  const handleAddTag = async (event: SubmitEvent) => {
+    event.preventDefault();
+    if (isSavingTag()) return;
+
+    const trimmed = newTagName().trim();
+    if (!trimmed) {
+      alert("タグ名を入力してください");
+      return;
+    }
+
+    if (state.tags.some((tag) => tag.name === trimmed)) {
+      alert("同じ名前のタグが既に存在します");
+      return;
+    }
+
+    try {
+      setIsSavingTag(true);
+      const newTag = await createTag(trimmed);
+      setSelectedTagIds((current) => [...current, newTag.id]);
+      setNewTagName("");
+    } catch (error) {
+      alert("タグの作成に失敗しました");
+      console.error(error);
+    } finally {
+      setIsSavingTag(false);
+    }
+  };
 
   const handlePhotoChange = async (e: Event) => {
     const input = e.currentTarget as HTMLInputElement;
@@ -98,9 +158,12 @@ const EditorModal: Component = () => {
           quantity: quantity(),
           memo: memo() || undefined,
           photo: photo() || undefined,
+          tagIds: [...selectedTagIds()],
         });
       } else {
-        await createItem(name(), quantity(), photo() || undefined, memo() || undefined);
+        await createItem(name(), quantity(), photo() || undefined, memo() || undefined, [
+          ...selectedTagIds(),
+        ]);
       }
       handleClose();
     } catch (error) {
@@ -186,6 +249,56 @@ const EditorModal: Component = () => {
               <div class="flex justify-center">
                 <QuantitySpinner value={quantity()} onChange={setQuantity} min={0} />
               </div>
+            </div>
+
+            {/* タグ */}
+            <div>
+              <label class="mb-2 block text-sm font-medium text-gray-700">タグ</label>
+              <Show
+                when={sortedTags().length > 0}
+                fallback={
+                  <p class="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-500">
+                    まだタグがありません。フォームから作成できます。
+                  </p>
+                }
+              >
+                <div class="flex flex-wrap gap-2">
+                  <For each={sortedTags()}>
+                    {(tag) => {
+                      const isSelected = () => selectedTagIds().includes(tag.id);
+                      return (
+                        <button
+                          type="button"
+                          onClick={() => toggleTag(tag.id)}
+                          class={`rounded-full border px-3 py-1 text-sm transition-colors ${
+                            isSelected()
+                              ? "border-blue-200 bg-blue-100 text-blue-700"
+                              : "border-gray-200 bg-white text-gray-600 hover:border-blue-200 hover:text-blue-600"
+                          }`}
+                        >
+                          {tag.name}
+                        </button>
+                      );
+                    }}
+                  </For>
+                </div>
+              </Show>
+              <form class="mt-3 flex flex-col gap-2 sm:flex-row" onSubmit={handleAddTag}>
+                <input
+                  type="text"
+                  value={newTagName()}
+                  onInput={(e) => setNewTagName(e.currentTarget.value)}
+                  class="flex-1 rounded-lg border-2 border-gray-300 bg-gray-50 px-4 py-2 text-sm transition-all focus:border-blue-500 focus:bg-white focus:outline-none"
+                  placeholder="例: 消耗品"
+                />
+                <button
+                  type="submit"
+                  class="rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-300"
+                  disabled={isSavingTag()}
+                >
+                  タグを追加
+                </button>
+              </form>
             </div>
 
             {/* メモ */}
