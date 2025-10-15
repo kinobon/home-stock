@@ -22,6 +22,7 @@ const initialState: AppState = {
   searchQuery: "",
   sortField: "name",
   sortOrder: "asc",
+  tagFilterIds: [],
   selectedItemId: undefined,
   view: "list",
   currentTab: "items",
@@ -72,6 +73,7 @@ export async function initializeStore() {
   setState("items", migratedItems);
   setState("tags", tags);
   setState("logs", logs);
+  setState("tagFilterIds", (ids) => ids.filter((id) => tags.some((tag) => tag.id === id)));
 }
 
 // アイテム作成
@@ -191,6 +193,7 @@ export async function updateTag(id: string, name: string) {
 export async function removeTag(id: string) {
   await deleteTagFromDB(id);
   setState("tags", (tags) => tags.filter((tag) => tag.id !== id));
+  setState("tagFilterIds", (ids) => ids.filter((tagId) => tagId !== id));
 
   const itemsUsingTag = state.items.filter((item) => item.tagIds?.includes(id));
   if (itemsUsingTag.length === 0) {
@@ -317,6 +320,7 @@ export async function clearAll() {
   setState("items", []);
   setState("tags", []);
   setState("logs", []);
+  setState("tagFilterIds", []);
 }
 
 // UI State
@@ -330,6 +334,16 @@ export function setSortField(field: SortField) {
 
 export function setSortOrder(order: SortOrder) {
   setState("sortOrder", order);
+}
+
+export function toggleTagFilter(tagId: string) {
+  setState("tagFilterIds", (ids) =>
+    ids.includes(tagId) ? ids.filter((id) => id !== tagId) : [...ids, tagId]
+  );
+}
+
+export function clearTagFilters() {
+  setState("tagFilterIds", []);
 }
 
 export function setSelectedItem(id?: string) {
@@ -472,6 +486,7 @@ export async function importData(jsonString: string) {
     // ステートを更新
     setState("tags", importedTags);
     setState("items", importedItems);
+    setState("tagFilterIds", []);
   } catch (error) {
     console.error("Import failed:", error);
     if (error instanceof SyntaxError) {

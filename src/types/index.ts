@@ -40,6 +40,7 @@ export interface AppState {
   searchQuery: string;
   sortField: SortField;
   sortOrder: SortOrder;
+  tagFilterIds: string[];
   selectedItemId?: ItemID;
   view: "list" | "editor" | "counter";
   currentTab: "items" | "history" | "settings";

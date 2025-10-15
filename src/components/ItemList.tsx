@@ -1,4 +1,4 @@
-import { For, createMemo, onMount, type Component, batch } from "solid-js";
+import { For, Show, createMemo, onMount, type Component, batch } from "solid-js";
 import {
   state,
   setCurrentTab,
@@ -6,6 +6,8 @@ import {
   setSelectedItem,
   setSortField,
   setSortOrder,
+  toggleTagFilter,
+  clearTagFilters,
   setView,
 } from "../state/store";
 import ItemCard from "./ItemCard";
@@ -81,6 +83,46 @@ const ItemList: Component = () => {
           <span>{state.sortOrder === "asc" ? "昇順" : "降順"}</span>
         </button>
       </div>
+
+      <Show when={state.tags.length > 0}>
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold tracking-wide text-gray-500 uppercase">
+              タグ絞り込み
+            </span>
+            <Show when={state.tagFilterIds.length > 0}>
+              <button
+                type="button"
+                onClick={clearTagFilters}
+                class="rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-600 transition-colors hover:border-blue-500 hover:text-blue-600 focus:outline-none"
+              >
+                絞り込み解除
+              </button>
+            </Show>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <For each={state.tags}>
+              {(tag) => {
+                const isActive = state.tagFilterIds.includes(tag.id);
+                return (
+                  <button
+                    type="button"
+                    onClick={() => toggleTagFilter(tag.id)}
+                    class={`rounded-full border px-3 py-1 text-sm transition-colors ${
+                      isActive
+                        ? "border-blue-200 bg-blue-100 text-blue-700"
+                        : "border-gray-200 bg-white text-gray-600 hover:border-blue-200 hover:text-blue-600"
+                    }`}
+                  >
+                    {tag.name}
+                  </button>
+                );
+              }}
+            </For>
+          </div>
+        </div>
+      </Show>
     </div>
   ));
 
@@ -136,16 +178,30 @@ const ItemList: Component = () => {
     const tagNameMap = new Map(state.tags.map((tag) => [tag.id, tag.name.toLowerCase()]));
     const sortField = state.sortField;
     const sortOrder = state.sortOrder;
+    const activeTagFilters = state.tagFilterIds;
 
     const filtered = state.items.filter((item) => {
-      if (!query) return true;
-      const nameMatch = item.name.toLowerCase().includes(query);
-      const memoMatch = item.memo?.toLowerCase().includes(query) ?? false;
-      const tagMatch = (item.tagIds ?? []).some((tagId) => {
-        const tagName = tagNameMap.get(tagId);
-        return tagName ? tagName.includes(query) : false;
-      });
-      return nameMatch || memoMatch || tagMatch;
+      const matchesQuery = (() => {
+        if (!query) return true;
+        const nameMatch = item.name.toLowerCase().includes(query);
+        const memoMatch = item.memo?.toLowerCase().includes(query) ?? false;
+        const tagMatch = (item.tagIds ?? []).some((tagId) => {
+          const tagName = tagNameMap.get(tagId);
+          return tagName ? tagName.includes(query) : false;
+        });
+        return nameMatch || memoMatch || tagMatch;
+      })();
+
+      if (!matchesQuery) {
+        return false;
+      }
+
+      if (activeTagFilters.length === 0) {
+        return true;
+      }
+
+      const itemTagIds = item.tagIds ?? [];
+      return activeTagFilters.every((filterId) => itemTagIds.includes(filterId));
     });
 
     const sorted = [...filtered].sort((a, b) => {
