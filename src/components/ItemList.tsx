@@ -102,7 +102,7 @@ const ItemList: Component = () => {
             </button>
             <For each={state.tags}>
               {(tag) => {
-                const isActive = state.tagFilterIds.includes(tag.id);
+                const isActive = () => state.tagFilterIds.includes(tag.id);
                 return (
                   <TagButton
                     label={tag.name}

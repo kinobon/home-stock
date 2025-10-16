@@ -1,4 +1,4 @@
-import { Show, splitProps, type Component } from "solid-js";
+import { Show, splitProps, type Accessor, type Component } from "solid-js";
 import { Check } from "lucide-solid";
 import type { JSX } from "solid-js";
 
@@ -8,7 +8,7 @@ interface TagButtonProps
   extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, "class" | "children" | "type"> {
   label: string;
   variant?: TagButtonVariant;
-  active?: boolean;
+  active?: boolean | Accessor<boolean>;
   showCheck?: boolean;
   class?: string;
   type?: JSX.ButtonHTMLAttributes<HTMLButtonElement>["type"];
@@ -44,7 +44,13 @@ export const TagButton: Component<TagButtonProps> = (props) => {
 
   const variant = () => local.variant ?? "filter";
   const styles = () => variantStyles[variant()];
-  const isActive = () => Boolean(local.active);
+  const isActive = () => {
+    const value = local.active;
+    if (typeof value === "function") {
+      return (value as Accessor<boolean>)();
+    }
+    return Boolean(value);
+  };
   const shouldShowCheck = () => local.showCheck ?? styles().showCheck;
 
   return (

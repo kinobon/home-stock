@@ -270,7 +270,7 @@ const EditorModal: Component = () => {
                       return (
                         <TagButton
                           label={tag.name}
-                          active={isSelected()}
+                          active={isSelected}
                           variant="select"
                           onClick={() => toggleTag(tag.id)}
                         />
