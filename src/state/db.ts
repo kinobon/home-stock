@@ -1,6 +1,7 @@
 import { openDB } from "idb";
 import type { DBSchema, IDBPDatabase } from "idb";
 import type { Item, Log, Tag } from "../types";
+import { unwrap } from "solid-js/store";
 
 interface HomeStockDB extends DBSchema {
   items: {
@@ -77,7 +78,12 @@ export async function getItem(id: string): Promise<Item | undefined> {
 
 export async function saveItem(item: Item): Promise<void> {
   const db = await getDB();
-  await db.put("items", item);
+  const rawItem = unwrap(item) as Item;
+  const plainItem: Item = {
+    ...rawItem,
+    tagIds: Array.isArray(rawItem.tagIds) ? [...rawItem.tagIds] : [],
+  };
+  await db.put("items", plainItem);
 }
 
 export async function deleteItem(id: string): Promise<void> {
@@ -100,13 +106,14 @@ export async function getAllLogs(): Promise<Log[]> {
 
 export async function saveLog(log: Log): Promise<void> {
   const db = await getDB();
-  await db.put("logs", log);
+  const plainLog = unwrap(log) as Log;
+  await db.put("logs", plainLog);
 }
 
 export async function saveLogs(logs: Log[]): Promise<void> {
   const db = await getDB();
   const tx = db.transaction("logs", "readwrite");
-  await Promise.all(logs.map((log) => tx.store.put(log)));
+  await Promise.all(logs.map((log) => tx.store.put(unwrap(log) as Log)));
   await tx.done;
 }
 
@@ -123,7 +130,8 @@ export async function getAllTags(): Promise<Tag[]> {
 
 export async function saveTag(tag: Tag): Promise<void> {
   const db = await getDB();
-  await db.put("tags", tag);
+  const plainTag = unwrap(tag) as Tag;
+  await db.put("tags", plainTag);
 }
 
 export async function deleteTag(id: string): Promise<void> {
