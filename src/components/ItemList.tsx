@@ -91,12 +91,12 @@ const ItemList: Component = () => {
             タグ絞り込み
           </span>
 
-          <div class="flex flex-wrap items-center gap-2">
+          <div class="flex w-full flex-nowrap items-center gap-2 overflow-x-auto pr-2 pb-2 [scrollbar-gutter:stable_both-edges]">
             <button
               type="button"
               onClick={clearTagFilters}
               disabled={state.tagFilterIds.length === 0}
-              class="rounded-full border border-gray-200 bg-white px-3 py-1 text-sm font-medium text-gray-600 transition-colors hover:border-blue-200 hover:text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:outline-none disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-100 disabled:text-gray-400"
+              class="shrink-0 rounded-full border border-gray-200 bg-white px-3 py-1 text-sm font-medium text-gray-600 transition-colors hover:border-blue-200 hover:text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:outline-none disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-100 disabled:text-gray-400"
             >
               全解除
             </button>
@@ -109,7 +109,7 @@ const ItemList: Component = () => {
                     onClick={() => toggleTagFilter(tag.id)}
                     aria-pressed={isActive}
                     data-active={isActive ? "true" : "false"}
-                    class={`flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:outline-none ${
+                    class={`flex shrink-0 items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:outline-none ${
                       isActive
                         ? "border-blue-600 bg-blue-100 text-blue-800 shadow-inner"
                         : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-700"
