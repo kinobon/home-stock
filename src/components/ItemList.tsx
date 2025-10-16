@@ -86,22 +86,19 @@ const ItemList: Component = () => {
 
       <Show when={state.tags.length > 0}>
         <div class="flex flex-col gap-2">
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold tracking-wide text-gray-500 uppercase">
-              タグ絞り込み
-            </span>
-            <Show when={state.tagFilterIds.length > 0}>
-              <button
-                type="button"
-                onClick={clearTagFilters}
-                class="rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-600 transition-colors hover:border-blue-500 hover:text-blue-600 focus:outline-none"
-              >
-                絞り込み解除
-              </button>
-            </Show>
-          </div>
+          <span class="text-xs font-semibold tracking-wide text-gray-500 uppercase">
+            タグ絞り込み
+          </span>
 
-          <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={clearTagFilters}
+              disabled={state.tagFilterIds.length === 0}
+              class="rounded-full border border-gray-200 bg-white px-3 py-1 text-sm font-medium text-gray-600 transition-colors hover:border-blue-200 hover:text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:outline-none disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-100 disabled:text-gray-400"
+            >
+              全解除
+            </button>
             <For each={state.tags}>
               {(tag) => {
                 const isActive = state.tagFilterIds.includes(tag.id);
@@ -109,10 +106,12 @@ const ItemList: Component = () => {
                   <button
                     type="button"
                     onClick={() => toggleTagFilter(tag.id)}
-                    class={`rounded-full border px-3 py-1 text-sm transition-colors ${
+                    aria-pressed={isActive}
+                    data-active={isActive ? "true" : "false"}
+                    class={`rounded-full border px-3 py-1 text-sm transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:outline-none ${
                       isActive
-                        ? "border-blue-200 bg-blue-100 text-blue-700"
-                        : "border-gray-200 bg-white text-gray-600 hover:border-blue-200 hover:text-blue-600"
+                        ? "border-blue-500 bg-blue-600 text-white shadow-sm hover:bg-blue-500"
+                        : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-700"
                     }`}
                   >
                     {tag.name}
