@@ -20,6 +20,7 @@ import {
   Clock,
   ArrowUp,
   ArrowDown,
+  Check,
 } from "lucide-solid";
 import { useUIState } from "../context/UIStateContext";
 import type { SortField } from "../types";
@@ -108,12 +109,15 @@ const ItemList: Component = () => {
                     onClick={() => toggleTagFilter(tag.id)}
                     aria-pressed={isActive}
                     data-active={isActive ? "true" : "false"}
-                    class={`rounded-full border px-3 py-1 text-sm transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:outline-none ${
+                    class={`flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:outline-none ${
                       isActive
-                        ? "border-blue-500 bg-blue-600 text-white shadow-sm hover:bg-blue-500"
+                        ? "border-blue-600 bg-blue-100 text-blue-800 shadow-inner"
                         : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-700"
                     }`}
                   >
+                    <Show when={isActive} fallback={null}>
+                      <Check size={14} />
+                    </Show>
                     {tag.name}
                   </button>
                 );
