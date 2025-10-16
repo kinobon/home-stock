@@ -22,7 +22,7 @@ const variantStyles: Record<
     base: "flex shrink-0 items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:outline-none",
     active: "border-blue-600 bg-blue-100 text-blue-800 shadow-inner",
     inactive: "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-700",
-    showCheck: true,
+    showCheck: false,
   },
   select: {
     base: "rounded-full border px-3 py-1 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1",
