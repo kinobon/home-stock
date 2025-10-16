@@ -91,33 +91,38 @@ const HistoryScreen: Component = () => {
                 {/* その日のログ一覧 */}
                 <div class="bg-white">
                   <For each={group.logs}>
-                    {(log) => (
-                      <div class="flex items-center gap-3 border-b border-gray-200 px-4 py-4">
-                        {/* 項目名 */}
-                        <div class="flex-1">
-                          <h3 class="text-base font-medium text-gray-900">{log.itemName}</h3>
-                        </div>
+                    {(log) => {
+                      if (log.delta === 0) {
+                        return null;
+                      }
+                      return (
+                        <div class="flex items-center gap-3 border-b border-gray-200 px-4 py-4">
+                          {/* 項目名 */}
+                          <div class="flex-1">
+                            <h3 class="text-base font-medium text-gray-900">{log.itemName}</h3>
+                          </div>
 
-                        {/* 変化量 */}
-                        <div class="text-right">
-                          <div
-                            class={`text-lg font-bold ${
-                              log.delta > 0
-                                ? "text-green-600"
-                                : log.delta < 0
-                                  ? "text-red-600"
-                                  : "text-gray-600"
-                            }`}
-                          >
-                            {log.delta > 0 ? "+" : ""}
-                            {log.delta}
-                          </div>
-                          <div class="text-xs text-gray-500">
-                            {log.oldValue} → {log.newValue}
+                          {/* 変化量 */}
+                          <div class="text-right">
+                            <div
+                              class={`text-lg font-bold ${
+                                log.delta > 0
+                                  ? "text-green-600"
+                                  : log.delta < 0
+                                    ? "text-red-600"
+                                    : "text-gray-600"
+                              }`}
+                            >
+                              {log.delta > 0 ? "+" : ""}
+                              {log.delta}
+                            </div>
+                            <div class="text-xs text-gray-500">
+                              {log.oldValue} → {log.newValue}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      );
+                    }}
                   </For>
                 </div>
               </div>
