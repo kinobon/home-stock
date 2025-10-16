@@ -8,6 +8,7 @@ import {
 } from "../state/store";
 import type { Item } from "../types";
 import { Minus, Plus } from "lucide-solid";
+import { TagBadge } from "./TagChip";
 
 interface ItemCardProps {
   item: Item;
@@ -63,13 +64,7 @@ const ItemCard: Component<ItemCardProps> = (props) => {
           <h3 class="text-base font-medium text-gray-900">{props.item.name}</h3>
           <Show when={tagNames().length > 0}>
             <div class="mt-1 flex flex-wrap gap-1">
-              <For each={tagNames()}>
-                {(name) => (
-                  <span class="rounded-full bg-blue-50 px-2 py-0.5 text-[0.65rem] font-medium text-blue-600">
-                    {name}
-                  </span>
-                )}
-              </For>
+              <For each={tagNames()}>{(name) => <TagBadge label={name} />}</For>
             </div>
           </Show>
         </div>

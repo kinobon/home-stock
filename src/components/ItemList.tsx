@@ -20,10 +20,10 @@ import {
   Clock,
   ArrowUp,
   ArrowDown,
-  Check,
 } from "lucide-solid";
 import { useUIState } from "../context/UIStateContext";
 import type { SortField } from "../types";
+import { TagButton } from "./TagChip";
 
 const ItemList: Component = () => {
   const [, { setHeader, setBottomNav, setFab }] = useUIState();
@@ -104,22 +104,12 @@ const ItemList: Component = () => {
               {(tag) => {
                 const isActive = state.tagFilterIds.includes(tag.id);
                 return (
-                  <button
-                    type="button"
+                  <TagButton
+                    label={tag.name}
+                    active={isActive}
                     onClick={() => toggleTagFilter(tag.id)}
-                    aria-pressed={isActive}
-                    data-active={isActive ? "true" : "false"}
-                    class={`flex shrink-0 items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:outline-none ${
-                      isActive
-                        ? "border-blue-600 bg-blue-100 text-blue-800 shadow-inner"
-                        : "border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:text-blue-700"
-                    }`}
-                  >
-                    <Show when={isActive} fallback={null}>
-                      <Check size={14} />
-                    </Show>
-                    {tag.name}
-                  </button>
+                    variant="filter"
+                  />
                 );
               }}
             </For>

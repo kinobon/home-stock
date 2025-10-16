@@ -13,6 +13,7 @@ import { X, Save, Image as ImageIcon, Loader2, Trash2 } from "lucide-solid";
 import QuantitySpinner from "./QuantitySpinner";
 import ImageCropper from "./ImageCropper";
 import FullScreenModal from "./FullScreenModal";
+import { TagButton } from "./TagChip";
 
 const EditorModal: Component = () => {
   const currentItem = () => state.items.find((item) => item.id === state.selectedItemId);
@@ -267,17 +268,12 @@ const EditorModal: Component = () => {
                     {(tag) => {
                       const isSelected = () => selectedTagIds().includes(tag.id);
                       return (
-                        <button
-                          type="button"
+                        <TagButton
+                          label={tag.name}
+                          active={isSelected()}
+                          variant="select"
                           onClick={() => toggleTag(tag.id)}
-                          class={`rounded-full border px-3 py-1 text-sm transition-colors ${
-                            isSelected()
-                              ? "border-blue-200 bg-blue-100 text-blue-700"
-                              : "border-gray-200 bg-white text-gray-600 hover:border-blue-200 hover:text-blue-600"
-                          }`}
-                        >
-                          {tag.name}
-                        </button>
+                        />
                       );
                     }}
                   </For>
