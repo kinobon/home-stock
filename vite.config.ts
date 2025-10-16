@@ -24,6 +24,11 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
+      devOptions: {
+        enabled: true,
+        suppressWarnings: true,
+        type: "module",
+      },
       manifest: {
         name: "Home Stock Manager",
         short_name: "HomeStock",
